@@ -92,7 +92,4 @@ program = "/usr/bin/fish"
 x = 20
 y = 20
 
-key_bindings:
-  - { key: V, mods: Control, action: Paste }
-  - { key: C, mods: Control, action: Copy }
-  - { key: Q, mods: Control, action: Quit }
+
