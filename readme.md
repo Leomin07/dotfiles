@@ -2,12 +2,10 @@
 
 ```
 cd ~/dotfiles
-stow .config/alacritty
-stow .config/karabiner
-stow .config/kitty
+stow kitty/
+stow kitty/
 
 ls -l ~/.config
-
 ```
 
 ### Fix
@@ -18,4 +16,8 @@ rm ~/.config/.DS_Store
 
 ```
 find ./ -name ".DS_Store" -type f -delete
+```
+
+```
+rm ~/.local/share/nvim
 ```

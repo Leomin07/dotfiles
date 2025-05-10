@@ -1,0 +1,34 @@
+import = ["~/.config/alacritty/themes/dracula.toml"]
+
+
+live_config_reload = true
+window.opacity = 0.7
+
+[font]
+size = 12
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+
+
+[[keyboard.bindings]]
+action = "SpawnNewInstance"
+key = "Return"
+mods = "Control|Shift"
+
+[[keyboard.bindings]]
+key = "Q"
+mods = "Control"
+action = "Quit"
+
+
+[shell]
+program = "/usr/bin/fish"
+
+[window.padding]
+x = 20
+y = 20
+
+[window.dimensions]
+columns = 120
+lines = 40
