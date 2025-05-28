@@ -46,3 +46,7 @@ lines = 40
 [window.padding]
 x = 20
 y = 20
+
+live_config_reload = true
+
+import = ["~/.config/alacritty/themes/dracula.toml",]
