@@ -1,3 +1,5 @@
+" https://raw.githubusercontent.com/neoclide/coc.nvim/master/doc/coc-example-config.vim
+
 " Extensions need to be installed at first startup
 let g:coc_global_extensions = [
       \'coc-css',
@@ -5,7 +7,19 @@ let g:coc_global_extensions = [
       \'coc-json',
       \'coc-vimlsp',
       \'coc-python',
+      \'coc-pyright',
+      \'coc-jedi',
+      \'coc-prettier',
+      \'coc-snippets',
+      \'coc-vimlsp',
+      \'coc-highlight',
+      \'coc-htmldjango',
+      \'coc-markdownlint',
+      \'coc-tabnine',
+      \'coc-zig',
+      \'coc-yaml',
       \]
+
 
 " May need for Vim (not Neovim) since coc.nvim calculates byte offset by count
 " utf-8 byte sequence
@@ -52,28 +66,28 @@ endif
 
 " Use `[g` and `]g` to navigate diagnostics
 " Use `:CocDiagnostics` to get all diagnostics of current buffer in location list
-nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
+nmap <silent><nowait> [g <Plug>(coc-diagnostic-prev)
+nmap <silent><nowait> ]g <Plug>(coc-diagnostic-next)
 
 " GoTo code navigation
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
+nmap <silent><nowait> gd <Plug>(coc-definition)
+nmap <silent><nowait> gy <Plug>(coc-type-definition)
+nmap <silent><nowait> gi <Plug>(coc-implementation)
+nmap <silent><nowait> gr <Plug>(coc-references)
 
 " Use K to show documentation in preview window
 nnoremap <silent> K :call ShowDocumentation()<CR>
 
-" function! ShowDocumentation()
-"   if CocAction('hasProvider', 'hover')
-"     call CocActionAsync('doHover')
-"   else
-"     call feedkeys('K', 'in')
-"   endif
-" endfunction
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
+    call CocActionAsync('doHover')
+  else
+    call feedkeys('K', 'in')
+  endif
+endfunction
 
 " Highlight the symbol and its references when holding the cursor
-" autocmd CursorHold * silent call CocActionAsync('highlight')
+autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " Symbol renaming
 nmap <leader>rn <Plug>(coc-rename)
@@ -86,8 +100,6 @@ augroup mygroup
   autocmd!
   " Setup formatexpr specified filetype(s)
   autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
 " Applying code actions to the selected code block

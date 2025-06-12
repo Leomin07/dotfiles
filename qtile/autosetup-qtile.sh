@@ -53,7 +53,7 @@ PACKAGES=(
 
     # AUR / Extra tools
     "google-chrome" "etcher-bin" "postman-bin" "dbeaver"
-    "tableplus" "telegram-desktop-bin"
+    "telegram-desktop-bin"
     "ffmpeg" "lazydocker" "visual-studio-code-bin"
     # "mongodb-compass-bin"
 )

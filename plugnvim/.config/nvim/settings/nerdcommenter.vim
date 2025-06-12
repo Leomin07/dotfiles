@@ -24,3 +24,10 @@ let g:NERDTrimTrailingWhitespace = 1
 
 " Enable NERDCommenterToggle to check all selected lines is commented or not 
 let g:NERDToggleCheckAllLines = 1
+
+" ======== NERDCommenter Mappings ========
+" Comment/uncomment từ dòng hiện tại đến đầu đoạn tiếp theo
+nnoremap <silent> <leader>c} V}:call nerdcommenter#Comment('x', 'toggle')<CR>
+
+" Comment/uncomment từ dòng hiện tại đến đầu đoạn trước đó
+nnoremap <silent> <leader>c{ V{:call nerdcommenter#Comment('x', 'toggle')<CR>
