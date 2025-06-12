@@ -54,3 +54,6 @@ let NERDTreeIgnore=['__pycache__', 'site-packages']
 
 " Hotkey to focus on NERDTree
 nnoremap <leader>nt :NERDTreeFocus<CR>
+
+" Show files and hide folders (starting with a dot)
+let NERDTreeShowHidden = 1

@@ -1,124 +1,53 @@
----@diagnostic disable: missing-fields
+
 return {
-  -- lsp servers
-  {
-    "neovim/nvim-lspconfig",
-    opts = {
-      diagnostics = { virtual_text = { prefix = "icons" } },
-      capabilities = {
-        workspace = {
-          didChangeWatchedFiles = {
-            dynamicRegistration = false,
-          },
-        },
-      },
-      servers = {
-        lua_ls = {
-          -- cmd = { "/home/folke/projects/lua-language-server/bin/lua-language-server" },
-          -- single_file_support = true,
-          settings = {
-            Lua = {
-              misc = {
-                -- parameters = { "--loglevel=trace" },
-              },
-              hover = { expandAlias = false },
-              type = {
-                castNumberToInteger = true,
-                inferParamType = true,
-              },
-              diagnostics = {
-                disable = { "incomplete-signature-doc", "trailing-space" },
-                -- enable = false,
-                groupSeverity = {
-                  strong = "Warning",
-                  strict = "Warning",
-                },
-                groupFileStatus = {
-                  ["ambiguity"] = "Opened",
-                  ["await"] = "Opened",
-                  ["codestyle"] = "None",
-                  ["duplicate"] = "Opened",
-                  ["global"] = "Opened",
-                  ["luadoc"] = "Opened",
-                  ["redefined"] = "Opened",
-                  ["strict"] = "Opened",
-                  ["strong"] = "Opened",
-                  ["type-check"] = "Opened",
-                  ["unbalanced"] = "Opened",
-                  ["unused"] = "Opened",
-                },
-                unusedLocalExclude = { "_*" },
-              },
-            },
-          },
-        },
-      },
+
+    {
+        "hrsh7th/nvim-cmp",
+        lazy = false,
+        dependencies = { "neovim/nvim-lspconfig" },
+        opts = function(_, opts)
+            table.insert(opts.sources, 1, { name = "nvim_lsp" })
+        end,
     },
-  },
 
-  {
-    "stevearc/conform.nvim",
-    event = { "BufReadPre", "BufNewFile" },
-    config = function()
-      local conform = require("conform")
-
-      conform.setup({
-        formatters_by_ft = {
-          javascript = { "prettier" },
-          typescript = { "prettier" },
-          javascriptreact = { "prettier" },
-          typescriptreact = { "prettier" },
-          css = { "prettier" },
-          html = { "prettier" },
-          json = { "prettier" },
-          yaml = { "prettier" },
-          markdown = { "prettier" },
-          lua = { "stylua" },
-          python = { "isort", "black" },
-        },
-        format_on_save = {
-          lsp_fallback = true,
-          async = false,
-          timeout_ms = 1000,
-        },
-      })
-
-      vim.keymap.set({ "n", "v" }, "<leader>f", function()
-        conform.format({
-          lsp_fallback = true,
-          async = false,
-          timeout_ms = 1000,
-        })
-      end, { desc = "Format file or range (in visual mode)" })
-    end,
-  },
-  
-  {
-    "mfussenegger/nvim-lint",
-    opts = {
-      linters_by_ft = {
-        lua = { "selene", "luacheck" },
-      },
-      linters = {
-        selene = {
-          condition = function(ctx)
-            local root = LazyVim.root.get({ normalize = true })
-            if root ~= vim.uv.cwd() then
-              return false
-            end
-            return vim.fs.find({ "selene.toml" }, { path = root, upward = true })[1]
-          end,
-        },
-        luacheck = {
-          condition = function(ctx)
-            local root = LazyVim.root.get({ normalize = true })
-            if root ~= vim.uv.cwd() then
-              return false
-            end
-            return vim.fs.find({ ".luacheckrc" }, { path = root, upward = true })[1]
-          end,
-        },
-      },
+    -- ************************************************************
+    -- VTSLS (TypeScript/JavaScript Language Server) Cấu hình
+    -- ************************************************************
+    {
+        "yioneko/nvim-vtsls",
+        lazy = false,
+        ft = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
+        -- No 'opts' initially, just to see if the plugin loads without a setup error
     },
-  },
+
+    -- ************************************************************
+    -- LuaSnip: Công cụ Snippet
+    -- ************************************************************
+    
+    {
+        "L3MON4D3/LuaSnip",
+        -- follow latest release.
+        version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+        -- install jsregexp (optional!).
+        build = "make install_jsregexp"
+    },
+
+    {
+        "hrsh7th/nvim-cmp",
+        optional = true,
+        dependencies = { "saadparwaiz1/cmp_luasnip" },
+        opts = function(_, opts)
+            opts.snippet = {
+            expand = function(args)
+                require("luasnip").lsp_expand(args.body)
+            end,
+            }
+            table.insert(opts.sources, { name = "luasnip" })
+        end,
+        -- stylua: ignore
+        keys = {
+            { "<tab>", function() require("luasnip").jump(1) end, mode = "s" },
+            { "<s-tab>", function() require("luasnip").jump(-1) end, mode = { "i", "s" } },
+        },
+    },
 }
