@@ -2,8 +2,9 @@
 
 ```
 cd ~/dotfiles
-stow kitty/
-stow kitty/
+stow kitty
+stow alacritty
+stow nvim
 
 ls -l ~/.config
 ```

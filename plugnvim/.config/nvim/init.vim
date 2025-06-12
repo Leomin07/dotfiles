@@ -1,75 +1,14 @@
 
-lua print('Neovim started...')
-" Đặt phím Space làm Leader key
-let g:mapleader = " "
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => General settings
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set mouse=a                 " Enable mouse
-set expandtab               " Tab setting
-set tabstop=4               " Tab setting
-set shiftwidth=4            " Tab setting
-set listchars=tab:\¦\       " Tab charactor
-set list
-set foldmethod=syntax
-set foldnestmax=1
-set foldlevelstart=3        "
-set number                  " Show line number
-set ignorecase              " Enable case-sensitive
-
-" Disable backup
-set nobackup
-set nowb
-set noswapfile
-
-" Optimize
-set synmaxcol=3000    "Prevent breaking syntax hightlight when string too long. Max = 3000"
-set lazyredraw
-au! BufNewFile,BufRead *.json set foldmethod=indent " Change foldmethod for specific filetype
-
-syntax on
-
-" Enable copying from vim to clipboard
-if has('win32')
-  set clipboard=unnamed
-else
-  set clipboard=unnamedplus
-endif
-
-" Auto reload content changed outside
-au CursorHold,CursorHoldI * checktime
-au FocusGained,BufEnter * :checktime
-autocmd FocusGained,BufEnter,CursorHold,CursorHoldI *
-    \ if mode() !~ '\v(c|r.?|!|t)' && getcmdwintype() == ''
-      \ | checktime
-    \ | endif
-autocmd FileChangedShellPost *
-    \ echohl WarningMsg
-    \ | echo "File changed on disk. Buffer reloaded."
-    \ | echohl None
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Key mappings
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Resize pane
-nmap <M-Right> :vertical resize +1<CR>
-nmap <M-Left> :vertical resize -1<CR>
-nmap <M-Down> :resize +1<CR>
-nmap <M-Up> :resize -1<CR>
-
-" Search a hightlighted text
-vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
-nmap /\ :noh<CR>
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugin list
 " (used with Vim-plug - https://github.com/junegunn/vim-plug)
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin(stdpath('config').'/plugged')
 " Theme
-  Plug 'joshdick/onedark.vim',                  " Dark theme
+  Plug 'tomasiser/vim-code-dark'
+  " Plug 'joshdick/onedark.vim',                  " Dark theme
   Plug 'akinsho/bufferline.nvim', { 'tag': '*' }
+  Plug 'nvim-tree/nvim-web-devicons' " Icon
 
 " File browser
   Plug 'preservim/nerdTree'                     " File browser
@@ -107,9 +46,9 @@ call plug#begin(stdpath('config').'/plugged')
     \ }
 
 " Code syntax highlight
-  " Plug 'yuezk/vim-js'                           " Javascript
-  " Plug 'MaxMEllon/vim-jsx-pretty'               " JSX/React
-  " Plug 'jackguo380/vim-lsp-cxx-highlight'       " C/C++
+  Plug 'yuezk/vim-js'                           " Javascript
+  Plug 'MaxMEllon/vim-jsx-pretty'               " JSX/React
+  Plug 'jackguo380/vim-lsp-cxx-highlight'       " C/C++
   " Plug 'uiiaoo/java-syntax.vim'                 " Java
   Plug 'sheerun/vim-polyglot'
 
@@ -124,6 +63,9 @@ call plug#begin(stdpath('config').'/plugged')
 
 " Fold
   Plug 'tmhedberg/SimpylFold'
+
+" Format
+  Plug 'stevearc/conform.nvim'
 call plug#end()
 
 
@@ -138,4 +80,12 @@ colorscheme onedark
 for setting_file in split(glob(stdpath('config').'/settings/*.vim'))
   execute 'source' setting_file
 endfor
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Config mapping
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+for keymap_file in split(glob(stdpath('config').'/config/*.vim'))
+  execute 'source' keymap_file
+endfor
+
 
