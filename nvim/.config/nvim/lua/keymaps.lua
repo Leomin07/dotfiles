@@ -96,7 +96,18 @@ map("n", "<leader>t", "<cmd>ToggleTerm<CR>", { desc = "Toggle Terminal" })
 map("t", "<leader>t", "<cmd>close<CR>", { desc = "Hide Terminal" })
 
 -- Exit terminal mode
-map("t", "<esc>", [[<C-\><C-n>]], { desc = "Exit Terminal Mode" })
+-- map("t", "<esc>", [[<C-\><C-n>]], { desc = "Exit Terminal Mode" })
+
+-- Kill all terminal
+map("n", "<C-t>k", function()
+    -- Lấy danh sách tất cả terminal buffers
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.bo[buf].buftype == "terminal" then
+            vim.api.nvim_buf_delete(buf, { force = true })
+        end
+    end
+end, { desc = "Kill All Terminals" })
+
 
 -- Run current file based on filetype
 map("n", "<F6>", function()
@@ -124,3 +135,4 @@ map("n", "<F6>", function()
         vim.notify("No run command defined for filetype: " .. filetype, vim.log.levels.WARN)
     end
 end, { desc = "Run current file with <F6>" })
+

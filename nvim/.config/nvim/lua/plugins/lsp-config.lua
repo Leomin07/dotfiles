@@ -122,13 +122,24 @@ return {
                 },
             })
             -- lsp kepmap setting
-            vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
-            vim.keymap.set("n", "gi", vim.lsp.buf.implementation, {})
-            vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
-            vim.keymap.set("n", "gD", vim.lsp.buf.declaration, {})
-            vim.keymap.set("n", "gr", vim.lsp.buf.references, {})
-            vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, {})
-            vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {})
+            -- vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
+            -- vim.keymap.set("n", "gi", vim.lsp.buf.implementation, {})
+            -- vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
+            -- vim.keymap.set("n", "gD", vim.lsp.buf.declaration, {})
+            -- vim.keymap.set("n", "gr", vim.lsp.buf.references, {})
+            -- vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, {})
+            -- vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {})
+
+            -- VSCode
+            vim.keymap.set("n", "<F12>", vim.lsp.buf.definition, { desc = "Go to Definition" })
+            vim.keymap.set("n", "<S-F12>", vim.lsp.buf.references, { desc = "Find References" })
+            vim.keymap.set("n", "<C-F12>", vim.lsp.buf.declaration, { desc = "Go to Declaration" })
+            vim.keymap.set("n", "<C-S-F12>", vim.lsp.buf.implementation, { desc = "Go to Implementation" })
+
+            vim.keymap.set("n", "<F2>", vim.lsp.buf.rename, { desc = "Rename" })
+            vim.keymap.set({ "n", "v" }, "<A-CR>", vim.lsp.buf.code_action, { desc = "Code Action" })
+            vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
+
             -- list all methods in a file
             -- working with go confirmed, don't know about other, keep changing as necessary
             vim.keymap.set("n", "<leader>fm", function()

@@ -1,6 +1,6 @@
 return {
     "nvim-treesitter/nvim-treesitter",
-    version = false, -- last release is way too old and doesn't work on Windows
+    version = false, 
     build = ":TSUpdate",
     event = { "VeryLazy" },
     lazy = vim.fn.argc(-1) == 0, -- load treesitter early when opening a file from the cmdline
@@ -53,6 +53,7 @@ return {
             "vimdoc",
             "xml",
             "yaml",
+            "bash"
         },
         incremental_selection = {
             enable = true,
