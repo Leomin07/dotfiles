@@ -1,47 +1,115 @@
 return {
 
+
     {
         "nvim-lualine/lualine.nvim",
+        event = "VeryLazy",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            require("lualine").setup({
+            local lualine = require("lualine")
+            local neogit = require("neogit")
+            local diffview = require("diffview")
+
+            local function toggle_neogit()
+                local neogit_buffer_found = false
+                for _, win in ipairs(vim.api.nvim_list_wins()) do
+                    local buf = vim.api.nvim_win_get_buf(win)
+                    local buftype = vim.api.nvim_buf_get_option(buf, "buftype")
+                    local filetype = vim.api.nvim_buf_get_option(buf, "filetype")
+                    if buftype == "nofile" and (filetype == "NeogitStatus" or filetype == "NeogitCommitMessage") then
+                        neogit_buffer_found = true
+                        vim.cmd("bd")
+                        break
+                    end
+                end
+
+                if not neogit_buffer_found then
+                    neogit.open({ kind = "tab" })
+                end
+            end
+
+            lualine.setup({
                 options = {
-                    theme = "vscode", -- hoặc "vscode", "tokyonight", v.v.
+                    theme = "vscode",
                     icons_enabled = true,
                     globalstatus = true,
                     section_separators = { left = "", right = "" },
                     component_separators = { left = "", right = "" },
+                    disabled_filetypes = { "alpha", "dashboard", "NvimTree", "Outline" },
                 },
                 sections = {
-                    lualine_a = { { "mode", icon = "" } },
+                    lualine_a = {
+                        { "mode", icon = "" }, -- NORMAL/INSERT...
+                    },
                     lualine_b = {
-                        { "branch", icon = "" },
-                        { "diff", symbols = { added = " ", modified = " ", removed = " " } },
+                        {
+                            "branch",
+                            icon = "",
+                            on_click = function()
+                                toggle_neogit()
+                            end,
+                        },
+                        {
+                            "diff",
+                            symbols = {
+                                added = " ",
+                                modified = " ",
+                                removed = " ",
+                            },
+                        },
                         {
                             "diagnostics",
-                            symbols = { error = " ", warn = " ", info = " ", hint = "󰌵 " },
+                            symbols = {
+                                error = " ",
+                                warn = " ",
+                                info = " ",
+                                hint = "󰌵 ",
+                            },
                         },
+
                     },
                     lualine_c = {
                         {
                             "filename",
                             path = 1, -- relative path
                             symbols = {
-                                modified = " ●", -- Text to show when the file is modified.
-                                readonly = " ", -- Text to show when the file is non-modifiable or readonly.
-                                unnamed = "[No Name]", -- Text to show for unnamed buffers.
+                                modified = " ●", -- file modified
+                                readonly = " ", -- file readonly
+                                unnamed = "[No Name]",
                             },
                         },
                     },
-                    lualine_x = { "encoding", "fileformat", "filetype" },
+                    lualine_x = {
+                        "encoding",
+                        "fileformat",
+                        "filetype",
+                    },
                     lualine_y = { "progress" },
                     lualine_z = { "location" },
                 },
-                extensions = { "neo-tree", "fugitive", "toggleterm", "lazy", "quickfix" },
+                inactive_sections = {
+                    lualine_a = {},
+                    lualine_b = {},
+                    lualine_c = {
+                        {
+                            "filename",
+                            path = 1,
+                        },
+                    },
+                    lualine_x = { "location" },
+                    lualine_y = {},
+                    lualine_z = {},
+                },
+                extensions = {
+                    "neo-tree",
+                    "fugitive",
+                    "toggleterm",
+                    "lazy",
+                    "quickfix",
+                },
             })
         end,
     },
-
 
     {
         "akinsho/bufferline.nvim",
@@ -144,14 +212,6 @@ return {
     },
 
 
-    -- {
-    --     "askfiy/visual_studio_code",
-    --     priority = 100,
-    --     config = function()
-    --         vim.cmd([[colorscheme visual_studio_code]])
-    --     end,
-    -- },
-
     {
         'luochen1990/rainbow',
         event = { 'BufReadPre', 'BufNewFile' },
@@ -189,6 +249,55 @@ return {
         end,
     },
 
-    
+    {
+        "kevinhwang91/nvim-ufo",
+        event = { "BufReadPost", "BufNewFile" },
+        dependencies = { "kevinhwang91/promise-async" },
+        config = function()
+            -- Setup keymaps
+            vim.keymap.set("n", "zR", require("ufo").openAllFolds, { desc = "Open all folds" })
+            vim.keymap.set("n", "zM", require("ufo").closeAllFolds, { desc = "Close all folds" })
+            vim.keymap.set("n", "zr", require("ufo").openFoldsExceptKinds, { desc = "Fold less" })
+            vim.keymap.set("n", "zm", require("ufo").closeFoldsWith, { desc = "Fold more" })
+            vim.keymap.set("n", "zp", require("ufo").peekFoldedLinesUnderCursor, { desc = "Peek fold" })
+
+            -- Setup options
+            vim.o.foldcolumn = "1"
+            vim.o.foldlevel = 99
+            vim.o.foldlevelstart = 99
+            vim.o.foldenable = true
+
+            require("ufo").setup({
+                preview = {
+                    win_config = {
+                        border = { "", "─", "", "", "", "─", "", "" },
+                        winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+                        winblend = 0,
+                    },
+                    mappings = {
+                        scrollU = "<C-u>",
+                        scrollD = "<C-d>",
+                    },
+                },
+                provider_selector = function(_, filetype, buftype)
+                    local function fallback(bufnr, err, provider)
+                        if type(err) == "string" and err:match("UfoFallbackException") then
+                            return require("ufo").getFolds(bufnr, provider)
+                        else
+                            return require("promise").reject(err)
+                        end
+                    end
+
+                    return (filetype == "" or buftype == "nofile") and "indent"
+                        or function(bufnr)
+                            return require("ufo")
+                                .getFolds(bufnr, "lsp")
+                                :catch(function(err) return fallback(bufnr, err, "treesitter") end)
+                                :catch(function(err) return fallback(bufnr, err, "indent") end)
+                        end
+                end,
+            })
+        end,
+    }
 
 }

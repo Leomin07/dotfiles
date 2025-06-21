@@ -17,20 +17,6 @@ map("n", "<leader>o", "<CMD>vsplit<CR>")
 -- Horizontal split
 map("n", "<leader>p", "<CMD>split<CR>")
 
--- Close current window
--- map("n", "<leader>q", "<CMD>close<CR>", { desc = "Close Current Window" })
--- map("n", "<C-w>", ":bprevious | bdelete #<CR>", { noremap = true, silent = true, desc = "Close buffer and go to previous" })
--- vim.keymap.set("n", "<C-w>", function()
---   local bufnr = vim.api.nvim_get_current_buf()
---   if vim.bo.modified then
---     local confirm = vim.fn.confirm("Buffer has unsaved changes. Close anyway?", "&Yes\n&No", 2)
---     if confirm ~= 1 then return end
---   end
---   vim.cmd("bdelete " .. bufnr)
--- end, { desc = "Close Buffer Safely", silent = true })
-
-
-
 -- Close current buffer
 map("n", "<C-w>", "<cmd>bd<cr>", { desc = "Close Current Buffer" })
 

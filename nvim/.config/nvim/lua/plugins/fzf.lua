@@ -23,11 +23,20 @@ return {
             keymap = {
                 fzf = { ["ctrl-q"] = "select-all+accept" },
             },
+            grep = {
+                -- Similar to VS Code, respect .gitignore, show line numbers, no heading (handled by fzf-lua)
+                -- --hidden is for hidden files/directories. Adjust if you don't want this by default.
+                rg_opts = "--hidden --glob '!.git/*' --column --line-number --no-heading --color=always",
+            },
+            live_grep = {
+                -- Inherits from `grep` above, but you can override here if needed
+                -- For a VS Code feel, --hidden is crucial for a comprehensive search
+                rg_opts = "--hidden --glob '!.git/*' --column --line-number --no-heading --color=always",
+            },
         })
-        vim.keymap.set("n", "<leader>ff", fzf.files, { desc = "Find Files" })
-        vim.keymap.set("n", "<leader>pf", fzf.git_files, { desc = "Find Git Files" })
-        vim.keymap.set("n", "<leader>fg", fzf.live_grep, { desc = "Live Grep" })
-        vim.keymap.set("n", "<leader>fG", function()
+        vim.keymap.set("n", "<C-p>", fzf.files, { desc = "Find Files" })
+        vim.keymap.set("n", "<leader>fg", fzf.grep, { desc = "Live Grep" })
+        vim.keymap.set("n", "<leader>sf", function()
             require("fzf-lua").live_grep({
                 rg_opts = "--hidden --glob '!.git/*' --column --line-number --no-heading --color=always -e",
             })
