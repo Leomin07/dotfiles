@@ -17,30 +17,25 @@ return {
                 {
                     mode = { "n", "v" },
                     { "<leader><tab>", group = "tabs" },
-                    { "<leader>c", group = "code" },
-                    { "<leader>/", desc = "Toggle comment" },
-                    { "<leader>d", group = "debug" },
-                    { "<leader>dp", group = "profiler" },
-                    { "<leader>f", group = "file/find" },
-                    { "<leader>ff", function() require("fzf-lua").files() end, desc = "Find Files (fzf)" },
-                    { "<leader>fg", function() require("fzf-lua").live_grep() end, desc = "Live Grep (fzf)" },
-                    { "<leader>fb", function() require("fzf-lua").buffers() end, desc = "Buffers (fzf)" },
-                    { "<leader>fh", function() require("fzf-lua").help_tags() end, desc = "Help Tags (fzf)" },
+                    { "<leader>c",     group = "code" },
+                    { "<leader>/",     desc = "Toggle comment" },
+                    { "<leader>d",     group = "debug" },
+                    { "<leader>dp",    group = "profiler" },
+                    { "<leader>f",     group = "file/find" },
+                    { "<leader>ff",    function() require("fzf-lua").files() end,     desc = "Find Files (fzf)" },
+                    { "<leader>fg",    function() require("fzf-lua").live_grep() end, desc = "Live Grep (fzf)" },
+                    { "<leader>fb",    function() require("fzf-lua").buffers() end,   desc = "Buffers (fzf)" },
+                    { "<leader>fh",    function() require("fzf-lua").help_tags() end, desc = "Help Tags (fzf)" },
 
-                    -- Git
-                    { "<leader>g", group = "git", icon = { icon = "󰊢 ", color = "magenta" } },
-                    { "<leader>go", "<cmd>DiffviewOpen<CR>", desc = "󰊢 Open Git Graph" },
+                    -- git
                     {
-                        "<leader>gf",
-                        function()
-                            local file = vim.fn.expand("%")
-                            vim.cmd("DiffviewFileHistory " .. file)
-                        end,
-                        desc = "󰋚 File Git History"
-                    },
-                    { "<leader>gH", "<cmd>DiffviewFileHistory<CR>", desc = " Repo Git History" },
+                        "<leader>g", group = "git" },
+                    { "<leader>gn", desc = " Neogit" },
+                    { "<leader>go", desc = "󰊢 Git Graph" },
+                    { "<leader>gh", desc = " Repo History" },
+                    { "<leader>gf", desc = "󰋚 File History" },
+                    { "<leader>gq", desc = "󰅖 Close Diffview" },
 
-                    { "<leader>gh", group = "hunks" },
                     { "<leader>q", group = "quit/session" },
                     { "<leader>s", group = "search" },
                     { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
@@ -166,60 +161,6 @@ return {
             { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
             { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,            desc = "Toggle Flash Search" },
         },
-    },
-
-    -- {
-    --     "echasnovski/mini.bufremove",
-    --     keys = {
-    --         {
-    --         "<C-w>",
-    --         function()
-    --             require("mini.bufremove").delete(0, false)
-    --         end,
-    --         desc = "Close Buffer",
-    --         },
-    --     },
-    -- }
-
-
-
-    {
-        "sindrets/diffview.nvim",
-        cmd = { "DiffviewOpen", "DiffviewFileHistory" },
-        dependencies = { "nvim-lua/plenary.nvim" },
-        config = function()
-            require("diffview").setup({
-                enhanced_diff_hl = true,
-                use_icons = true,
-                view = {
-                    merge_tool = {
-                        layout = "diff3_mixed", -- 3 panel như Git Graph
-                        disable_diagnostics = true,
-                    },
-                },
-                file_panel = {
-                    listing_style = "tree",
-                    win_config = { position = "left", width = 35 },
-                },
-            })
-
-            -- Keymaps giống VS Code Git Graph
-            vim.keymap.set("n", "<leader>go", "<cmd>DiffviewOpen<CR>", { desc = "󰊢 Open Git Graph" })
-            vim.keymap.set("n", "<leader>gh", "<cmd>DiffviewFileHistory<CR>", { desc = " Repo History" })
-            vim.keymap.set("n", "<leader>gf", function()
-                local file = vim.fn.expand("%")
-                vim.cmd("DiffviewFileHistory " .. file)
-            end, { desc = "󰋚 File Git History" })
-
-            -- Optional: Toggle diffview nếu đang mở
-            vim.keymap.set("n", "<leader>gq", function()
-                local current_buf = vim.api.nvim_get_current_buf()
-                local name = vim.api.nvim_buf_get_name(current_buf)
-                if name:match("^diffview://") then
-                    vim.cmd("DiffviewClose")
-                end
-            end, { desc = "󰅖 Close Diffview" })
-        end,
     },
 
 
