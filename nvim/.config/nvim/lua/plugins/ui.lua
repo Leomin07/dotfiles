@@ -1,6 +1,4 @@
 return {
-
-
     {
         "nvim-lualine/lualine.nvim",
         event = "VeryLazy",
@@ -8,7 +6,6 @@ return {
         config = function()
             local lualine = require("lualine")
             local neogit = require("neogit")
-            local diffview = require("diffview")
 
             local function toggle_neogit()
                 local neogit_buffer_found = false
@@ -66,7 +63,6 @@ return {
                                 hint = "󰌵 ",
                             },
                         },
-
                     },
                     lualine_c = {
                         {
@@ -131,9 +127,9 @@ return {
                         style = "icon",
                     },
 
-                    buffer_close_icon = "󰅖", -- Biểu tượng đóng tab
-                    modified_icon = "%#DiagnosticHint#●%*", -- Biểu tượng buffer chưa lưu
-                    close_icon = "", -- Biểu tượng đóng toàn bộ
+                    buffer_close_icon = "󰅖",
+                    modified_icon = "%#DiagnosticHint#●%*",
+                    close_icon = "",
                     show_buffer_close_icons = true,
                     show_close_icon = true,
 
@@ -154,8 +150,6 @@ return {
 
                     separator_style = "slant",
                     always_show_bufferline = true,
-
-                    -- Hiển thị khu vực custom nếu có buffer chưa lưu
                     custom_areas = {
                         left = function()
                             local result = {}
@@ -172,8 +166,6 @@ return {
             })
         end,
     },
-
-
 
     {
         "lukas-reineke/indent-blankline.nvim",
@@ -241,13 +233,49 @@ return {
         config = function()
             local vscode = require("vscode")
             vscode.setup({
-                -- Bạn có thể chỉnh lại màu nếu muốn:
                 italic_comments = true,
                 disable_nvimtree_bg = true,
             })
-            vscode.load("dark") -- hoặc "light"
+            vscode.load("dark")
         end,
     },
+
+    -- {
+    --     "shellRaining/hlchunk.nvim",
+    --     event = { "BufReadPre", "BufNewFile" },
+    --     config = function()
+    --         require("hlchunk").setup({
+    --             chunk = {
+    --                 chars = {
+    --                     horizontal_line = "─",
+    --                     vertical_line = "│",
+    --                     left_top = "╭",
+    --                     left_bottom = "╰",
+    --                     right_arrow = ">",
+    --                 },
+    --                 enable = false,
+    --                 style = "#806d9c",
+    --                 -- style = "#c21f30",
+    --                 duration = 0,
+    --                 delay = 0,
+    --             },
+    --             indent = {
+    --                 chars = {
+    --                     "│",
+    --                 },
+    --                 style = {
+    --                     "#FF0000",
+    --                     "#FF7F00",
+    --                     "#FFFF00",
+    --                     "#00FF00",
+    --                     "#00FFFF",
+    --                     "#0000FF",
+    --                     "#8B00FF",
+    --                 },
+    --             }
+    --         })
+    --     end
+    -- },
 
     {
         "kevinhwang91/nvim-ufo",
@@ -255,11 +283,8 @@ return {
         dependencies = { "kevinhwang91/promise-async" },
         config = function()
             -- Setup keymaps
-            vim.keymap.set("n", "zR", require("ufo").openAllFolds, { desc = "Open all folds" })
-            vim.keymap.set("n", "zM", require("ufo").closeAllFolds, { desc = "Close all folds" })
-            vim.keymap.set("n", "zr", require("ufo").openFoldsExceptKinds, { desc = "Fold less" })
-            vim.keymap.set("n", "zm", require("ufo").closeFoldsWith, { desc = "Fold more" })
-            vim.keymap.set("n", "zp", require("ufo").peekFoldedLinesUnderCursor, { desc = "Peek fold" })
+            vim.keymap.set("n", "zr", require("ufo").openAllFolds, { desc = "Open all folds" })
+            vim.keymap.set("n", "zm", require("ufo").closeAllFolds, { desc = "Close all folds" })
 
             -- Setup options
             vim.o.foldcolumn = "1"
@@ -267,37 +292,44 @@ return {
             vim.o.foldlevelstart = 99
             vim.o.foldenable = true
 
-            require("ufo").setup({
-                preview = {
-                    win_config = {
-                        border = { "", "─", "", "", "", "─", "", "" },
-                        winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
-                        winblend = 0,
-                    },
-                    mappings = {
-                        scrollU = "<C-u>",
-                        scrollD = "<C-d>",
-                    },
-                },
-                provider_selector = function(_, filetype, buftype)
-                    local function fallback(bufnr, err, provider)
-                        if type(err) == "string" and err:match("UfoFallbackException") then
-                            return require("ufo").getFolds(bufnr, provider)
-                        else
-                            return require("promise").reject(err)
-                        end
-                    end
+            -- require("ufo").setup({
+            --     preview = {
+            --         win_config = {
+            --             border = { "", "─", "", "", "", "─", "", "" },
+            --             winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+            --             winblend = 0,
+            --         },
+            --         mappings = {
+            --             scrollU = "<C-u>",
+            --             scrollD = "<C-d>",
+            --         },
+            --     },
+            --     provider_selector = function(_, filetype, buftype)
+            --         local function fallback(bufnr, err, provider)
+            --             if type(err) == "string" and err:match("UfoFallbackException") then
+            --                 return require("ufo").getFolds(bufnr, provider)
+            --             else
+            --                 return require("promise").reject(err)
+            --             end
+            --         end
 
-                    return (filetype == "" or buftype == "nofile") and "indent"
-                        or function(bufnr)
-                            return require("ufo")
-                                .getFolds(bufnr, "lsp")
-                                :catch(function(err) return fallback(bufnr, err, "treesitter") end)
-                                :catch(function(err) return fallback(bufnr, err, "indent") end)
-                        end
+            --         return (filetype == "" or buftype == "nofile") and "indent"
+            --             or function(bufnr)
+            --                 return require("ufo")
+            --                     .getFolds(bufnr, "lsp")
+            --                     :catch(function(err) return fallback(bufnr, err, "treesitter") end)
+            --                     :catch(function(err) return fallback(bufnr, err, "indent") end)
+            --             end
+            --     end,
+            -- })
+            require('ufo').setup({
+                provider_selector = function(bufnr, filetype, buftype)
+                    return { 'treesitter', 'indent' }
                 end,
             })
         end,
     }
+
+
 
 }

@@ -124,3 +124,4 @@ map("n", "<F6>", function()
         vim.notify("No run command defined for filetype: " .. filetype, vim.log.levels.WARN)
     end
 end, { desc = "Run current file with <F6>" })
+

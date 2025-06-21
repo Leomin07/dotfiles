@@ -6,7 +6,9 @@ return {
         opts = { use_diagnostic_signs = true },
     },
 
-    {
+    -- Trong file ~/.config/nvim/lua/plugins/init.lua
+
+{
         "folke/which-key.nvim",
         event = "VeryLazy",
         opts_extend = { "spec" },
@@ -17,19 +19,17 @@ return {
                 {
                     mode = { "n", "v" },
                     { "<leader><tab>", group = "tabs" },
-                    { "<leader>c",     group = "code" },
-                    { "<leader>/",     desc = "Toggle comment" },
-                    { "<leader>d",     group = "debug" },
-                    { "<leader>dp",    group = "profiler" },
-                    { "<leader>f",     group = "file/find" },
-                    { "<leader>ff",    function() require("fzf-lua").files() end,     desc = "Find Files (fzf)" },
-                    { "<leader>fg",    function() require("fzf-lua").live_grep() end, desc = "Live Grep (fzf)" },
-                    { "<leader>fb",    function() require("fzf-lua").buffers() end,   desc = "Buffers (fzf)" },
-                    { "<leader>fh",    function() require("fzf-lua").help_tags() end, desc = "Help Tags (fzf)" },
-
+                    { "<leader>c", group = "code" },
+                    { "<leader>/", desc = "Toggle comment" },
+                    { "<leader>d", group = "debug" },
+                    { "<leader>dp", group = "profiler" },
+                    { "<leader>f", group = "file/find" },
+                    { "<C-p>", function() require("fzf-lua").files() end, desc = "Find Files (fzf)" },
+                    { "<leader>fg", function() require("fzf-lua").live_grep() end, desc = "Live Grep (fzf)" },
+                    { "<leader>fb", function() require("fzf-lua").buffers() end, desc = "Buffers (fzf)" },
+                    { "<leader>fh", function() require("fzf-lua").help_tags() end, desc = "Help Tags (fzf)" },
                     -- git
-                    {
-                        "<leader>g", group = "git" },
+                    { "<leader>g", group = "git" },
                     { "<leader>gn", desc = " Neogit" },
                     { "<leader>go", desc = "󰊢 Git Graph" },
                     { "<leader>gh", desc = " Repo History" },
@@ -44,7 +44,11 @@ return {
                     { "]", group = "next" },
                     { "g", group = "goto" },
                     { "gs", group = "surround" },
-                    { "z", group = "fold" },
+
+                    -- Ufo
+                    { "<leader>z", group = "ufo" },
+                    { "<leader>zr", function() require("ufo").closeAllFolds() end, desc="Close All Folds"  },
+                    { "<leader>zm", function() require("ufo").openAllFolds() end, desc="Open All Folds" },
 
                     {
                         "<leader>b",
@@ -91,8 +95,6 @@ return {
         end,
     },
 
-
-
     {
         'numToStr/Comment.nvim',
         opts = {},
@@ -113,14 +115,12 @@ return {
         end,
     },
 
-
     {
         "folke/todo-comments.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
         event = "VeryLazy",
         opts = {},
         keys = {
-            -- Di chuyển giữa các todo comment
             { "]t",         function() require("todo-comments").jump_next() end, desc = "Next Todo Comment" },
             { "[t",         function() require("todo-comments").jump_prev() end, desc = "Previous Todo Comment" },
 
@@ -145,8 +145,6 @@ return {
             },
         },
     },
-
-
 
     {
         "folke/flash.nvim",
