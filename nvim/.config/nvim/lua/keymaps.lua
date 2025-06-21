@@ -51,10 +51,12 @@ map("n", "<C-h>", "<C-w>h")
 map("n", "<C-l>", "<C-w>l")
 
 -- Copy to system clipboard (visual mode)
-map("v", "<C-c>", '"+y', { noremap = true })
+-- map("v", "<C-c>", '"+y',  {noremap = true, silent = true })
+map({"n", "v"}, "<C-c>", '"+y', { desc = "Copy (VS Code style)" })
 
 -- Paste from system clipboard (normal mode)
-map("n", "<C-v>", '"+p', { noremap = true })
+-- map("n", "<C-v>", '"+p',  {noremap = true, silent = true })
+map({"n", "v"}, "<C-v>", '"+p', { desc = "Paste (VS Code style)" })
 
 -- Use system clipboard
 vim.opt.clipboard = "unnamedplus"
@@ -124,3 +126,4 @@ map("n", "<F6>", function()
         vim.notify("No run command defined for filetype: " .. filetype, vim.log.levels.WARN)
     end
 end, { desc = "Run current file with <F6>" })
+
