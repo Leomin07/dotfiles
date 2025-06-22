@@ -277,58 +277,8 @@ return {
     --     end
     -- },
 
-    {
-        "kevinhwang91/nvim-ufo",
-        event = { "BufReadPost", "BufNewFile" },
-        dependencies = { "kevinhwang91/promise-async" },
-        config = function()
-            -- Setup keymaps
-            vim.keymap.set("n", "zr", require("ufo").openAllFolds, { desc = "Open all folds" })
-            vim.keymap.set("n", "zm", require("ufo").closeAllFolds, { desc = "Close all folds" })
+ 
 
-            -- Setup options
-            vim.o.foldcolumn = "1"
-            vim.o.foldlevel = 99
-            vim.o.foldlevelstart = 99
-            vim.o.foldenable = true
-
-            -- require("ufo").setup({
-            --     preview = {
-            --         win_config = {
-            --             border = { "", "─", "", "", "", "─", "", "" },
-            --             winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
-            --             winblend = 0,
-            --         },
-            --         mappings = {
-            --             scrollU = "<C-u>",
-            --             scrollD = "<C-d>",
-            --         },
-            --     },
-            --     provider_selector = function(_, filetype, buftype)
-            --         local function fallback(bufnr, err, provider)
-            --             if type(err) == "string" and err:match("UfoFallbackException") then
-            --                 return require("ufo").getFolds(bufnr, provider)
-            --             else
-            --                 return require("promise").reject(err)
-            --             end
-            --         end
-
-            --         return (filetype == "" or buftype == "nofile") and "indent"
-            --             or function(bufnr)
-            --                 return require("ufo")
-            --                     .getFolds(bufnr, "lsp")
-            --                     :catch(function(err) return fallback(bufnr, err, "treesitter") end)
-            --                     :catch(function(err) return fallback(bufnr, err, "indent") end)
-            --             end
-            --     end,
-            -- })
-            require('ufo').setup({
-                provider_selector = function(bufnr, filetype, buftype)
-                    return { 'treesitter', 'indent' }
-                end,
-            })
-        end,
-    }
 
 
 
