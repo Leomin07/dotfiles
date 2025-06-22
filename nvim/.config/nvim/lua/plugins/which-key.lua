@@ -36,8 +36,8 @@ return {
 
                 -- Folds (UFO)
                 { "<leader>z", group = { name = " Fold" } },
-                { "<leader>zr", function() require("ufo").closeAllFolds() end, desc = "Close All Folds" },
-                { "<leader>zm", function() require("ufo").openAllFolds() end, desc = "Open All Folds" },
+                { "<leader>zc", function() require("ufo").closeAllFolds() end, desc = "Close All Folds" },
+                { "<leader>za", function() require("ufo").openAllFolds() end, desc = "Open All Folds" },
 
                 -- Terminal
                 { "<leader>t", "<cmd>ToggleTerm<CR>", desc = " Toggle Terminal" },
