@@ -1,5 +1,5 @@
 {
-  "Comment.nvim": {
+ "Comment.nvim": {
     "branch": "master",
     "commit": "e30b7f2008e52442154b66f7c519bfd2f1e32acb"
   },
@@ -191,4 +191,6 @@
     "branch": "main",
     "commit": "370ec46f710e058c9c1646273e6b225acf47cbed"
   }
+}
+
 }
