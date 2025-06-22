@@ -5,7 +5,6 @@ return {
         "TimUntersberger/neogit",
         dependencies = {
             "nvim-lua/plenary.nvim",
-            "sindrets/diffview.nvim",
         },
         cmd = { "Neogit", "DiffviewOpen", "DiffviewFileHistory" },
         config = function()
@@ -44,7 +43,7 @@ return {
     -- Diffview (hiển thị diff, history)
     {
         "sindrets/diffview.nvim",
-        cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+        event = "VeryLazy", -- hoặc BufReadPost nếu bạn muốn sớm hơn
         dependencies = { "nvim-lua/plenary.nvim" },
         config = function()
             require("diffview").setup({
