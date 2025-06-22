@@ -19,6 +19,7 @@ return {
                     section = { "", "" },
                     item = { "", "" },
                 },
+                kind = 'split'
             })
 
             -- Toggle Neogit tab

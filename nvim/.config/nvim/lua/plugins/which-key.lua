@@ -9,22 +9,9 @@ return {
             {
                 mode = { "n", "v" },
 
-                -- LSP
-                { "<leader>l", group = { name = " LSP" } },
-                { "<leader>li", "<cmd>LspInfo<CR>", desc = "LSP Info" },
-                { "<leader>lr", vim.lsp.buf.rename, desc = "Rename Symbol" },
-                { "<leader>la", vim.lsp.buf.code_action, desc = "Code Action" },
-
                 -- Comment
                 { "<leader>/", desc = " Toggle Comment" },
 
-                -- FZF
-                { "<leader>f", group = { name = "󰈞 Find" } },
-                { "<C-p>", function() require("fzf-lua").files() end, desc = "Find Files (fzf)" },
-                { "<leader>fg", function() require("fzf-lua").grep() end, desc = "Grep (fzf)" },
-                { "<leader>sf", function() require("fzf-lua").live_grep() end, desc = "Live Grep (fzf)" },
-                { "<leader>fb", function() require("fzf-lua").buffers() end, desc = "Buffers (fzf)" },
-                { "<leader>fh", function() require("fzf-lua").help_tags() end, desc = "Help Tags (fzf)" },
 
                 -- Git
                 { "<leader>g", group = { name = " Git" } },
@@ -82,7 +69,7 @@ return {
                 },
 
                 -- Buffer & window navigation
-                { "<C-w>", "<cmd>bd<CR>", desc = "Close Buffer" },
+                { "<C-w>", "<cmd>bd<CR>",                desc = "Close Buffer" },
                 {
                     "<leader>b",
                     group = { name = "󰈙 Buffer" },
@@ -98,46 +85,27 @@ return {
                         return require("which-key.extras").expand.win()
                     end
                 },
-
-                -- Clipboard
-                { "<C-c>", "+y", mode = "v", desc = "Copy to System Clipboard" },
-                { "<C-v>", "+p", mode = "n", desc = "Paste from System Clipboard" },
-
-                -- Undo / Redo
-                { "<C-z>", "u", desc = "Undo", mode = { "n", "v" } },
-                { "<C-z>", "<Esc>u", mode = "i", desc = "Undo (Insert Mode)" },
-                { "<C-z>", "<C-\\><C-n>u", mode = "t", desc = "Undo (Terminal Mode)" },
-                { "<C-S-z>", "<C-r>", desc = "Redo", mode = { "n", "v" } },
-                { "<C-S-z>", "<Esc><C-r>", mode = "i", desc = "Redo (Insert Mode)" },
-                { "<C-S-z>", "<C-\\><C-n><C-r>", mode = "t", desc = "Redo (Terminal Mode)" },
-
-                -- Visual move blocks
-                { "<S-A-Up>", "yyp", desc = "Copy Line Above", mode = "n" },
-                { "<S-A-Down>", "yyP", desc = "Copy Line Below", mode = "n" },
-                { "<S-A-Up>", "y`<P`>]", desc = "Copy Visual Above", mode = "v" },
-                { "<S-A-Down>", "y`>p`<]", desc = "Copy Visual Below", mode = "v" },
-
                 -- Open with system
-                { "gx", desc = "Open with System App" },
+                { "gx",    desc = "Open with System App" },
             },
         },
     },
-    keys = {
-        {
-            "<leader>?",
-            function()
-                require("which-key").show({ global = false })
-            end,
-            desc = "󰍉 Show Keymaps",
-        },
-        {
-            "<c-w><space>",
-            function()
-                require("which-key").show({ keys = "<c-w>", loop = true })
-            end,
-            desc = "Window Hydra Mode",
-        },
-    },
+    -- keys = {
+    --     {
+    --         "<leader>?",
+    --         function()
+    --             require("which-key").show({ global = false })
+    --         end,
+    --         desc = "󰍉 Show Keymaps",
+    --     },
+    --     {
+    --         "<c-w><space>",
+    --         function()
+    --             require("which-key").show({ keys = "<c-w>", loop = true })
+    --         end,
+    --         desc = "Window Hydra Mode",
+    --     },
+    -- },
     config = function(_, opts)
         local wk = require("which-key")
         wk.setup(opts)
