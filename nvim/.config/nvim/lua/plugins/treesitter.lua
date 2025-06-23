@@ -23,9 +23,7 @@ return {
     ---@diagnostic disable-next-line: missing-fields
     opts = {
         highlight = { enable = true },
-        rainbow = {
-            enable = true,
-        },
+        indent = { enable = true },
         fold = { enable = true },
         indent = { enable = true },
         ensure_installed = {
@@ -38,7 +36,6 @@ return {
             "json",
             "jsonc",
             "lua",
-            "luadoc",
             "luap",
             "markdown",
             "markdown_inline",
@@ -53,6 +50,9 @@ return {
             "vimdoc",
             "xml",
             "yaml",
+            "html",
+            "css",
+            "vue"
         },
         incremental_selection = {
             enable = true,
@@ -84,4 +84,21 @@ return {
     --   end
     --   require("nvim-treesitter.configs").setup(opts)
     -- end,
+    ---@param opts TSConfig
+    config = function(_, opts)
+        if type(opts.ensure_installed) == "table" then
+            -- loại bỏ phần tử trùng nhau
+            local seen = {}
+            local unique = {}
+            for _, lang in ipairs(opts.ensure_installed) do
+                if not seen[lang] then
+                    table.insert(unique, lang)
+                    seen[lang] = true
+                end
+            end
+            opts.ensure_installed = unique
+        end
+
+        require("nvim-treesitter.configs").setup(opts)
+    end,
 }
