@@ -1,121 +1,105 @@
 vim.g.mapleader = " "
 
+-- Map helper with silent=true by default
 local function map(mode, lhs, rhs, opts)
     opts = vim.tbl_extend("force", { silent = true }, opts or {})
     vim.keymap.set(mode, lhs, rhs, opts)
 end
 
--- Save current file
+-- Save
 map("n", "<leader>w", "<CMD>update<CR>")
 
--- Exit insert mode quickly
+-- Quick exit insert
 map("i", "jk", "<ESC>")
 
--- Vertical split
+-- Splits
 map("n", "<leader>o", "<CMD>vsplit<CR>")
-
--- Horizontal split
 map("n", "<leader>p", "<CMD>split<CR>")
 
--- Close current buffer
+-- Close buffer / quit
 map("n", "<C-w>", "<cmd>bd<cr>", { desc = "Close Current Buffer" })
-
--- Quit all files
 map("n", "<leader>qq", "<cmd>qa<CR>", { desc = "Quit All" })
 
--- Save file in normal mode
+-- Save
 map("n", "<C-s>", "<cmd>w<CR>")
-
--- Save file in insert mode
 map("i", "<C-s>", "<Esc><cmd>w<CR>")
 
--- Select all in normal mode
-map("n", "<C-a>", "ggVG", { noremap = true })
+-- Select all
+map("n", "<C-a>", "ggVG")
+map("i", "<C-a>", "<Esc>ggVG")
 
--- Select all in insert mode
-map("i", "<C-a>", "<Esc>ggVG", { noremap = true })
-
--- Clear search highlight
+-- Clear search
 map("n", "<leader>h", ":nohlsearch<CR>")
 
--- Navigate windows: up
+-- Window nav
 map("n", "<C-k>", "<C-w>k")
-
--- Navigate windows: down
 map("n", "<C-j>", "<C-w>j")
-
--- Navigate windows: left
 map("n", "<C-h>", "<C-w>h")
-
--- Navigate windows: right
 map("n", "<C-l>", "<C-w>l")
 
--- Copy to system clipboard (visual mode)
--- map("v", "<C-c>", '"+y',  {noremap = true, silent = true })
-map({"n", "v"}, "<C-c>", '"+y', { desc = "Copy (VS Code style)" })
+-- System clipboard: copy, cut, paste
+map({ "n", "v" }, "<C-c>", function()
+    if vim.fn.mode():match("[vV]") then
+        vim.cmd('normal! "+y')
+    else
+        vim.cmd('normal! "+yy')
+    end
+end, { desc = "󰅍 Copy to clipboard" })
 
--- Paste from system clipboard (normal mode)
--- map("n", "<C-v>", '"+p',  {noremap = true, silent = true })
-map({"n", "v"}, "<C-v>", '"+p', { desc = "Paste (VS Code style)" })
+map({ "n", "v" }, "<C-x>", function()
+    if vim.fn.mode():match("[vV]") then
+        vim.cmd('normal! "+d')
+    else
+        vim.cmd('normal! "+dd')
+    end
+end, { desc = "󰅎 Cut to clipboard" })
 
--- Use system clipboard
+map({ "n", "v" }, "<C-v>", '"+p', { desc = "󰅏 Paste from clipboard" })
+
 vim.opt.clipboard = "unnamedplus"
 
--- Undo (normal & visual mode)
-map({ "n", "v" }, "<C-z>", "u", { desc = "Undo last change" })
+-- Undo / Redo
+map({ "n", "v" }, "<C-z>", "u", { desc = "Undo" })
+map("i", "<C-z>", "<Esc>u", { desc = "Undo" })
+map("t", "<C-z>", "<C-\\><C-n>u", { desc = "Undo" })
 
--- Undo (insert mode)
-map("i", "<C-z>", "<Esc>u", { desc = "Undo from Insert mode" })
+map({ "n", "v" }, "<C-S-z>", "<C-r>", { desc = "Redo" })
+map("i", "<C-S-z>", "<Esc><C-r>", { desc = "Redo" })
+map("t", "<C-S-z>", "<C-\\><C-n><C-r>", { desc = "Redo" })
 
--- Undo (terminal mode)
-map("t", "<C-z>", "<C-\\><C-n>u", { desc = "Undo from Terminal mode" })
+-- Duplicate / move lines (Alt + Up/Down)
+map("n", "<A-Up>", ":m .-2<CR>==", { desc = "󰜮 Move line up" })
+map("n", "<A-Down>", ":m .+1<CR>==", { desc = "󰜯 Move line down" })
+map("v", "<A-Up>", ":m '<-2<CR>gv=gv", { desc = "󰜮 Move selection up" })
+map("v", "<A-Down>", ":m '>+1<CR>gv=gv", { desc = "󰜯 Move selection down" })
 
--- Redo (normal & visual mode)
-map({ "n", "v" }, "<C-S-z>", "<C-r>", { desc = "Redo last undo" })
+-- Copy line up/down (Shift + Alt + Up/Down)
+map("n", "<S-A-Up>", "yyp", { desc = "󰆐 Copy line above" })
+map("n", "<S-A-Down>", "yyP", { desc = "󰆏 Copy line below" })
+map("v", "<S-A-Up>", "y`<P`>]", { desc = "󰆐 Copy block above" })
+map("v", "<S-A-Down>", "y`>p`<]", { desc = "󰆏 Copy block below" })
 
--- Redo (insert mode)
-map("i", "<C-S-z>", "<Esc><C-r>", { desc = "Redo from Insert mode" })
-
--- Redo (terminal mode)
-map("t", "<C-S-z>", "<C-\\><C-n><C-r>", { desc = "Redo from Terminal mode" })
-
--- Copy current line below (normal mode)
-map("n", "<S-A-Down>", "yyP", { noremap = true })
-
--- Copy current line above (normal mode)
-map("n", "<S-A-Up>", "yyp", { noremap = true })
-
--- Copy visual block below
-map("v", "<S-A-Down>", "y`>p`<]", { noremap = true })
-
--- Copy visual block above
-map("v", "<S-A-Up>", "y`<P`>]", { noremap = true })
-
--- Toggle terminal
+-- Terminal toggle
 map("n", "<leader>t", "<cmd>ToggleTerm<CR>", { desc = "Toggle Terminal" })
-
--- Hide terminal from terminal mode
 map("t", "<leader>t", "<cmd>close<CR>", { desc = "Hide Terminal" })
-
--- Exit terminal mode
 map("t", "<esc>", [[<C-\><C-n>]], { desc = "Exit Terminal Mode" })
 
--- Run current file based on filetype
+-- Run current file with F6
 map("n", "<F6>", function()
-    local filetype = vim.bo.filetype
-    local filepath = vim.fn.expand("%")
-    local filename = vim.fn.expand("%:t:r")
+    local ft = vim.bo.filetype
+    local file = vim.fn.expand("%")
+    local bin = vim.fn.expand("%:t:r")
 
     local cmd = {
-        python = "python3 " .. filepath,
-        javascript = "node " .. filepath,
-        typescript = "ts-node " .. filepath,
-        sh = "bash " .. filepath,
-        go = "go run " .. filepath,
-        c = string.format("gcc %s -o /tmp/%s && /tmp/%s", filepath, filename, filename),
+        python = "python3 " .. file,
+        javascript = "node " .. file,
+        typescript = "ts-node " .. file,
+        sh = "bash " .. file,
+        go = "go run " .. file,
+        c = string.format("gcc %s -o /tmp/%s && /tmp/%s", file, bin, bin),
     }
 
-    local run = cmd[filetype]
+    local run = cmd[ft]
     if run then
         require("toggleterm.terminal").Terminal:new({
             cmd = run,
@@ -123,7 +107,19 @@ map("n", "<F6>", function()
             close_on_exit = false,
         }):toggle()
     else
-        vim.notify("No run command defined for filetype: " .. filetype, vim.log.levels.WARN)
+        vim.notify("⚠ No run command for filetype: " .. ft, vim.log.levels.WARN)
     end
-end, { desc = "Run current file with <F6>" })
+end, { desc = "󰑊 Run Current File" })
 
+
+-- Delete current line (normal mode)
+vim.keymap.set("n", "<C-S-k>", "dd", { noremap = true, desc = "Delete Line" })
+
+-- Delete visual block (visual mode)
+vim.keymap.set("v", "<C-S-k>", "d", { noremap = true, desc = "Delete Block" })
+
+-- Duplicate current line (normal mode)
+vim.keymap.set("n", "<C-d>", "yyp", { noremap = true, desc = "Duplicate Line" })
+
+-- Duplicate visual block (visual mode)
+vim.keymap.set("v", "<C-d>", "y`>p`<]", { noremap = true, desc = "Duplicate Block" })

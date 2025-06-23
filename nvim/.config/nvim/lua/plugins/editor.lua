@@ -6,95 +6,6 @@ return {
         opts = { use_diagnostic_signs = true },
     },
 
-    -- Trong file ~/.config/nvim/lua/plugins/init.lua
-
-    {
-        "folke/which-key.nvim",
-        event = "VeryLazy",
-        opts_extend = { "spec" },
-        opts = {
-            preset = "helix",
-            defaults = {},
-            spec = {
-                {
-                    mode = { "n", "v" },
-                    { "<leader><tab>", group = "tabs" },
-                    { "<leader>c", group = "code" },
-                    { "<leader>/", desc = "Toggle comment" },
-                    { "<leader>d", group = "debug" },
-                    { "<leader>dp", group = "profiler" },
-                    { "<leader>f", group = "file/find" },
-                    { "<C-p>", function() require("fzf-lua").files() end, desc = "Find Files (fzf)" },
-                    { "<leader>fg", function() require("fzf-lua").live_grep() end, desc = "Live Grep (fzf)" },
-                    { "<leader>fb", function() require("fzf-lua").buffers() end, desc = "Buffers (fzf)" },
-                    { "<leader>fh", function() require("fzf-lua").help_tags() end, desc = "Help Tags (fzf)" },
-                    -- git
-                    { "<leader>g", group = "git" },
-                    { "<leader>gn", desc = " Neogit" },
-                    { "<leader>go", desc = "󰊢 Git Graph" },
-                    { "<leader>gh", desc = " Repo History" },
-                    { "<leader>gf", desc = "󰋚 File History" },
-                    { "<leader>gq", desc = "󰅖 Close Diffview" },
-
-                    { "<leader>q", group = "quit/session" },
-                    { "<leader>s", group = "search" },
-                    { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
-                    { "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
-                    { "[", group = "prev" },
-                    { "]", group = "next" },
-                    { "g", group = "goto" },
-                    { "gs", group = "surround" },
-
-                    -- Ufo
-                    { "<leader>z", group = "ufo" },
-                    { "<leader>zr", function() require("ufo").closeAllFolds() end, desc = "Close All Folds" },
-                    { "<leader>zm", function() require("ufo").openAllFolds() end, desc = "Open All Folds" },
-
-                    {
-                        "<leader>b",
-                        group = "buffer",
-                        expand = function()
-                            return require("which-key.extras").expand.buf()
-                        end,
-                    },
-                    {
-                        "<leader>w",
-                        group = "windows",
-                        proxy = "<c-w>",
-                        expand = function()
-                            return require("which-key.extras").expand.win()
-                        end,
-                    },
-                    { "gx", desc = "Open with system app" },
-                },
-            },
-        },
-        keys = {
-            {
-                "<leader>?",
-                function()
-                    require("which-key").show({ global = false })
-                end,
-                desc = "Buffer Keymaps (which-key)",
-            },
-            {
-                "<c-w><space>",
-                function()
-                    require("which-key").show({ keys = "<c-w>", loop = true })
-                end,
-                desc = "Window Hydra Mode (which-key)",
-            },
-        },
-        config = function(_, opts)
-            local wk = require("which-key")
-            wk.setup(opts)
-            if not vim.tbl_isempty(opts.defaults) then
-                LazyVim.warn("which-key: opts.defaults is deprecated. Please use opts.spec instead.")
-                wk.register(opts.defaults)
-            end
-        end,
-    },
-
     {
         'numToStr/Comment.nvim',
         opts = {},
@@ -128,7 +39,7 @@ return {
             { "<leader>xt", "<cmd>TodoTrouble<cr>",                              desc = "Toggle Todo (Trouble)" },
             { "<leader>xT", "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",      desc = "Filter Todo/Fix/Fixme (Trouble)" },
 
-            -- FZF-lua integration (thay vì Telescope)
+            -- FZF-lua integration
             {
                 "<leader>st",
                 function()
