@@ -159,24 +159,24 @@
 --     },
 
 -- }
+--
 return {
     -- Mason: LSP server installer
     {
         "williamboman/mason.nvim",
+        build = ":MasonUpdate",
         config = function()
             require("mason").setup()
         end,
     },
 
-    -- Mason-lspconfig: Bridge giữa mason và lspconfig
     {
         "williamboman/mason-lspconfig.nvim",
         lazy = false,
-        opts = {
-            auto_install = true,
-            ensure_installed = {
+        config = function()
+            local servers = {
                 "lua_ls",
-                "vtsls", -- JavaScript/TypeScript/Vue/NestJS
+                "vtsls",
                 "html",
                 "cssls",
                 "pyright",
@@ -186,11 +186,26 @@ return {
                 "tailwindcss",
                 "yamlls",
                 "emmet_ls",
-            },
-        },
+            }
+
+            require("mason-lspconfig").setup({
+                ensure_installed = servers,
+                automatic_installation = true,
+            })
+
+            -- Auto install nếu thiếu
+            local registry = require("mason-registry")
+            for _, name in ipairs(servers) do
+                local ok, pkg = pcall(registry.get_package, name)
+                if ok and not pkg:is_installed() then
+                    pkg:install()
+                    vim.notify("🔧 Installing LSP: " .. name)
+                end
+            end
+        end,
     },
 
-    -- LSP config
+    --LSP config
     {
         "neovim/nvim-lspconfig",
         lazy = false,
@@ -203,9 +218,7 @@ return {
                 capabilities = capabilities,
                 settings = {
                     Lua = {
-                        diagnostics = {
-                            globals = { "vim", "require" },
-                        },
+                        diagnostics = { globals = { "vim" } },
                         workspace = {
                             library = vim.api.nvim_get_runtime_file("", true),
                             checkThirdParty = false,
@@ -215,24 +228,13 @@ return {
                 },
             })
 
-            -- JavaScript / TypeScript / Vue / React / NestJS
+            -- JS/TS/Vue/NestJS
             lspconfig.vtsls.setup({
                 capabilities = capabilities,
                 settings = {
-                    complete_function_calls = true,
                     vtsls = {
                         enableMoveToFileCodeAction = true,
                         autoUseWorkspaceTsdk = true,
-                        experimental = {
-                            enableProjectDiagnostics = false,
-                            -- Giảm số lượng completion trả về để tránh lag
-                            completion = {
-                                enableServerSideFuzzyMatch = true,
-                                entriesLimit = 100,
-                            },
-                            -- Tắt project-wide diagnostics nếu quá nặng
-                            enableProjectDiagnostics = false,
-                        },
                     },
                     typescript = {
                         updateImportsOnFileMove = { enabled = "always" },
@@ -259,18 +261,20 @@ return {
                         suggest = {
                             completeFunctionCalls = true,
                         },
+                        
                     },
                 },
             })
 
-            -- HTML / CSS / JSON / YAML / Markdown
-            lspconfig.html.setup({ capabilities = capabilities })
-            lspconfig.cssls.setup({ capabilities = capabilities })
-            lspconfig.jsonls.setup({ capabilities = capabilities })
-            lspconfig.yamlls.setup({ capabilities = capabilities })
+            -- HTML/CSS/JSON/YAML
+            for _, server in ipairs({ "html", "cssls", "jsonls", "yamlls" }) do
+                lspconfig[server].setup({ capabilities = capabilities })
+            end
+
+            -- Markdown
             lspconfig.marksman.setup({ capabilities = capabilities })
 
-            -- Tailwind CSS
+            -- Tailwind
             lspconfig.tailwindcss.setup({ capabilities = capabilities })
 
             -- Python
@@ -283,39 +287,27 @@ return {
             lspconfig.emmet_ls.setup({
                 capabilities = capabilities,
                 filetypes = {
-                    "html", "css", "scss", "javascriptreact", "typescriptreact",
-                    "blade", "vue", "svelte",
+                    "html", "css", "scss", "javascriptreact", "typescriptreact", "vue",
                 },
                 init_options = {
-                    html = {
-                        options = {
-                            ["bem.enabled"] = true,
-                        },
-                    },
+                    html = { options = { ["bem.enabled"] = true } },
                 },
             })
 
-            -- LSP Keymaps (giống VSCode)
-            vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
-            vim.keymap.set("n", "gi", vim.lsp.buf.implementation, {})
-            vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
-            vim.keymap.set("n", "gD", vim.lsp.buf.declaration, {})
-            vim.keymap.set("n", "gr", vim.lsp.buf.references, {})
-            vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, {})
-            vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {})
+            -- Keymap giống VSCode
+            local map = vim.keymap.set
+            map("n", "K", vim.lsp.buf.hover, { desc = "LSP Hover" })
+            map("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
+            map("n", "gD", vim.lsp.buf.declaration, { desc = "Go to Declaration" })
+            map("n", "gi", vim.lsp.buf.implementation, { desc = "Go to Implementation" })
+            map("n", "gr", vim.lsp.buf.references, { desc = "List References" })
+            map("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename Symbol" })
+            map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
 
-            -- FZF: liệt kê function/method trong file
-            vim.keymap.set("n", "<leader>fm", function()
-                local filetype = vim.bo.filetype
-                local symbols_map = {
-                    python = "function",
-                    javascript = "function",
-                    typescript = "function",
-                    lua = "function",
-                }
-                local symbols = symbols_map[filetype] or "function"
-                require("fzf-lua").lsp_document_symbols({ symbols = symbols })
-            end, { desc = "List functions in file" })
+            -- FZF tìm function
+            map("n", "<leader>fm", function()
+                require("fzf-lua").lsp_document_symbols({ symbols = "function" })
+            end, { desc = "󰊕 List Functions (FZF)" })
 
             vim.diagnostic.config({
                 virtual_text = true,
@@ -326,7 +318,7 @@ return {
         end,
     },
 
-    -- VTSLS plugin (optional nếu bạn cài từ mason rồi)
+    -- vtsls plugin
     {
         "yioneko/nvim-vtsls",
         lazy = false,
