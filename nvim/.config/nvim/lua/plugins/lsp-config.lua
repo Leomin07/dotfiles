@@ -223,11 +223,36 @@ return {
                     vtsls = {
                         enableMoveToFileCodeAction = true,
                         autoUseWorkspaceTsdk = true,
+                        experimental = {
+                            enableProjectDiagnostics = false,
+                            -- Giảm số lượng completion trả về để tránh lag
+                            completion = {
+                                enableServerSideFuzzyMatch = true,
+                                entriesLimit = 100,
+                            },
+                            -- Tắt project-wide diagnostics nếu quá nặng
+                            enableProjectDiagnostics = false,
+                        },
                     },
                     typescript = {
                         updateImportsOnFileMove = { enabled = "always" },
                         suggest = {
                             completeFunctionCalls = true,
+                        },
+                        tsserver = {
+                            -- Tăng bộ nhớ tối đa cho tsserver lên 8GB
+                            -- maxTsServerMemory = 8192,
+                            maxTsServerMemory = 3072,
+                            -- Nếu đang gặp lỗi plugin, có thể vô hiệu hóa
+                            globalPlugins = {}, -- hoặc nil nếu không dùng
+                        },
+                        preferences = {
+                            includePackageJsonAutoImports = "off",
+                            autoImportFileExcludePatterns = {
+                                "**/node_modules/**",
+                                "**/.next/**",
+                                "**/dist/**",
+                            },
                         },
                     },
                     javascript = {

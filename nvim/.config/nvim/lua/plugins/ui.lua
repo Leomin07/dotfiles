@@ -203,17 +203,50 @@ return {
         end
     },
 
-
     {
-        'luochen1990/rainbow',
+        'hiphish/rainbow-delimiters.nvim',
         event = { 'BufReadPre', 'BufNewFile' },
-        init = function()
-            vim.g.rainbow_active = 1
-        end,
         config = function()
-            vim.cmd('RainbowToggleOn')
+            vim.g.rainbow_delimiters = {
+                strategy = {
+                    [''] = 'rainbow-delimiters.strategy.global',
+                    vim = 'rainbow-delimiters.strategy.local',
+                },
+                query = {
+                    [''] = 'rainbow-delimiters',
+                    lua = 'rainbow-blocks',
+                },
+                priority = {
+                    [''] = 110,
+                    lua = 210,
+                },
+                highlight = {
+                    'RainbowDelimiterViolet',
+                    'RainbowDelimiterBlue',
+                    'RainbowDelimiterCyan',
+                    'RainbowDelimiterGreen',
+                    'RainbowDelimiterYellow',
+                    'RainbowDelimiterOrange',
+                    'RainbowDelimiterRed',
+                },
+            }
+
+            local colors = {
+                Violet = "#ffd700",
+                Blue   = "#da70d6",
+                Cyan   = "#87cefa",
+                Green  = "#32cd32",
+                Yellow = "#ffa500",
+                Orange = "#00ced1",
+                Red    = "#ff69b4",
+            }
+
+            for name, hex in pairs(colors) do
+                vim.api.nvim_set_hl(0, "RainbowDelimiter" .. name, { fg = hex })
+            end
         end,
     },
+
 
     -- {
     --     "lukas-reineke/indent-blankline.nvim",
@@ -239,42 +272,5 @@ return {
             vscode.load("dark")
         end,
     },
-
-    -- {
-    --     "shellRaining/hlchunk.nvim",
-    --     event = { "BufReadPre", "BufNewFile" },
-    --     config = function()
-    --         require("hlchunk").setup({
-    --             chunk = {
-    --                 chars = {
-    --                     horizontal_line = "─",
-    --                     vertical_line = "│",
-    --                     left_top = "╭",
-    --                     left_bottom = "╰",
-    --                     right_arrow = ">",
-    --                 },
-    --                 enable = false,
-    --                 style = "#806d9c",
-    --                 -- style = "#c21f30",
-    --                 duration = 0,
-    --                 delay = 0,
-    --             },
-    --             indent = {
-    --                 chars = {
-    --                     "│",
-    --                 },
-    --                 style = {
-    --                     "#FF0000",
-    --                     "#FF7F00",
-    --                     "#FFFF00",
-    --                     "#00FF00",
-    --                     "#00FFFF",
-    --                     "#0000FF",
-    --                     "#8B00FF",
-    --                 },
-    --             }
-    --         })
-    --     end
-    -- },
 
 }

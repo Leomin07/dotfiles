@@ -119,7 +119,7 @@ vim.keymap.set("n", "<C-S-k>", "dd", { noremap = true, desc = "Delete Line" })
 vim.keymap.set("v", "<C-S-k>", "d", { noremap = true, desc = "Delete Block" })
 
 -- Duplicate current line (normal mode)
-vim.keymap.set("n", "<C-d>", "yyp", { noremap = true, desc = "Duplicate Line" })
+-- vim.keymap.set("n", "<C-d>", "yyp", { noremap = true, desc = "Duplicate Line" })
 
 -- Duplicate visual block (visual mode)
 vim.keymap.set("v", "<C-d>", "y`>p`<]", { noremap = true, desc = "Duplicate Block" })
