@@ -30,10 +30,6 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.autoindent = true
 
--- Show invisible characters (tabs, trailing spaces, etc.)
-vim.opt.list = true
-vim.opt.listchars = "tab:»\\ ,extends:›,precedes:‹,nbsp:·,trail:·"
-
 -- Keep line wrap but disable automatic line breaking
 vim.opt.formatoptions:remove("t")
 
@@ -66,5 +62,12 @@ vim.opt.isfname:append("@-@")
 -- Faster plugin response time
 vim.opt.updatetime = 50
 
-vim.opt.termguicolors = true 
+vim.opt.termguicolors = true
+
+vim.o.mouse = "a"
+
+-- Highlight search
+vim.o.hlsearch = true
+vim.o.incsearch = true
+
 
