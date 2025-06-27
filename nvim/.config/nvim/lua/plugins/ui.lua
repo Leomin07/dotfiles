@@ -1,276 +1,225 @@
 return {
-    {
-        "nvim-lualine/lualine.nvim",
-        event = "VeryLazy",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
-        config = function()
-            local lualine = require("lualine")
-            local neogit = require("neogit")
+	{
+		"akinsho/bufferline.nvim",
+		event = "VeryLazy",
+		version = "*",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		config = function()
+			require("bufferline").setup({
+				options = {
+					mode = "buffers",
+					numbers = "none",
+					close_command = "bdelete! %d",
+					right_mouse_command = "bdelete! %d",
+					left_mouse_command = "buffer %d",
+					middle_mouse_command = nil,
 
-            local function toggle_neogit()
-                local neogit_buffer_found = false
-                for _, win in ipairs(vim.api.nvim_list_wins()) do
-                    local buf = vim.api.nvim_win_get_buf(win)
-                    local buftype = vim.api.nvim_buf_get_option(buf, "buftype")
-                    local filetype = vim.api.nvim_buf_get_option(buf, "filetype")
-                    if buftype == "nofile" and (filetype == "NeogitStatus" or filetype == "NeogitCommitMessage") then
-                        neogit_buffer_found = true
-                        vim.cmd("bd")
-                        break
-                    end
-                end
+					indicator = {
+						icon = "▎",
+						style = "icon",
+					},
 
-                if not neogit_buffer_found then
-                    neogit.open({ kind = "tab" })
-                end
-            end
+					buffer_close_icon = "󰅖",
+					modified_icon = "%#DiagnosticHint#●%*",
+					close_icon = "",
+					show_buffer_close_icons = true,
+					show_close_icon = true,
 
-            lualine.setup({
-                options = {
-                    theme = "vscode",
-                    icons_enabled = true,
-                    globalstatus = true,
-                    section_separators = { left = "", right = "" },
-                    component_separators = { left = "", right = "" },
-                    disabled_filetypes = { "alpha", "dashboard", "NvimTree", "Outline" },
-                },
-                sections = {
-                    lualine_a = {
-                        { "mode", icon = "" }, -- NORMAL/INSERT...
-                    },
-                    lualine_b = {
-                        {
-                            "branch",
-                            icon = "",
-                            on_click = function()
-                                toggle_neogit()
-                            end,
-                        },
-                        {
-                            "diff",
-                            symbols = {
-                                added = " ",
-                                modified = " ",
-                                removed = " ",
-                            },
-                        },
-                        {
-                            "diagnostics",
-                            symbols = {
-                                error = " ",
-                                warn = " ",
-                                info = " ",
-                                hint = "󰌵 ",
-                            },
-                        },
-                    },
-                    lualine_c = {
-                        {
-                            "filename",
-                            path = 1, -- relative path
-                            symbols = {
-                                modified = " ●", -- file modified
-                                readonly = " ", -- file readonly
-                                unnamed = "[No Name]",
-                            },
-                        },
-                    },
-                    lualine_x = {
-                        "encoding",
-                        "fileformat",
-                        "filetype",
-                    },
-                    lualine_y = { "progress" },
-                    lualine_z = { "location" },
-                },
-                inactive_sections = {
-                    lualine_a = {},
-                    lualine_b = {},
-                    lualine_c = {
-                        {
-                            "filename",
-                            path = 1,
-                        },
-                    },
-                    lualine_x = { "location" },
-                    lualine_y = {},
-                    lualine_z = {},
-                },
-                extensions = {
-                    "neo-tree",
-                    "fugitive",
-                    "toggleterm",
-                    "lazy",
-                    "quickfix",
-                },
-            })
-        end,
-    },
+					diagnostics = "nvim_lsp",
+					diagnostics_indicator = function(count, level)
+						local icon = level:match("error") and " " or " "
+						return " " .. icon .. count
+					end,
 
-    {
-        "akinsho/bufferline.nvim",
-        event = "VeryLazy",
-        version = "*",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
-        config = function()
-            require("bufferline").setup({
-                options = {
-                    mode = "buffers",
-                    numbers = "none",
-                    close_command = "bdelete! %d",
-                    right_mouse_command = "bdelete! %d",
-                    left_mouse_command = "buffer %d",
-                    middle_mouse_command = nil,
+					offsets = {
+						{
+							filetype = "neo-tree",
+							text = "󰙅 File Explorer",
+							highlight = "Directory",
+							text_align = "left",
+						},
+					},
 
-                    indicator = {
-                        icon = "▎",
-                        style = "icon",
-                    },
+					separator_style = "slant",
+					always_show_bufferline = true,
+					custom_areas = {
+						left = function()
+							local result = {}
+							for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+								if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_option(buf, "modified") then
+									table.insert(result, { text = " ● Unsaved", fg = "#f7768e" })
+									break
+								end
+							end
+							return result
+						end,
+					},
+				},
+			})
+		end,
+	},
 
-                    buffer_close_icon = "󰅖",
-                    modified_icon = "%#DiagnosticHint#●%*",
-                    close_icon = "",
-                    show_buffer_close_icons = true,
-                    show_close_icon = true,
+	-- {
+	-- 	"lukas-reineke/indent-blankline.nvim",
+	-- 	event = "VeryLazy",
+	-- 	main = "ibl",
+	-- 	---@module "ibl"
+	-- 	---@type ibl.config
+	-- 	opts = {},
 
-                    diagnostics = "nvim_lsp",
-                    diagnostics_indicator = function(count, level)
-                        local icon = level:match("error") and " " or " "
-                        return " " .. icon .. count
-                    end,
+	-- 	config = function()
+	-- 		local highlight = {
+	-- 			"RainbowRed",
+	-- 			"RainbowYellow",
+	-- 			"RainbowBlue",
+	-- 			"RainbowOrange",
+	-- 			"RainbowGreen",
+	-- 			"RainbowViolet",
+	-- 			"RainbowCyan",
+	-- 		}
 
-                    offsets = {
-                        {
-                            filetype = "neo-tree",
-                            text = "󰙅 File Explorer",
-                            highlight = "Directory",
-                            text_align = "left",
-                        },
-                    },
+	-- 		local hooks = require("ibl.hooks")
+	-- 		-- create the highlight groups in the highlight setup hook, so they are reset
+	-- 		-- every time the colorscheme changes
+	-- 		hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+	-- 			vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#E06C75" })
+	-- 			vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#E5C07B" })
+	-- 			vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#61AFEF" })
+	-- 			vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#D19A66" })
+	-- 			vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#98C379" })
+	-- 			vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
+	-- 			vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
+	-- 		end)
 
-                    separator_style = "slant",
-                    always_show_bufferline = true,
-                    custom_areas = {
-                        left = function()
-                            local result = {}
-                            for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-                                if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_option(buf, "modified") then
-                                    table.insert(result, { text = " ● Unsaved", fg = "#f7768e" })
-                                    break
-                                end
-                            end
-                            return result
-                        end,
-                    },
-                },
-            })
-        end,
-    },
+	-- 		require("ibl").setup({ indent = { highlight = highlight } })
+	-- 	end,
+	-- },
 
-    {
-        "lukas-reineke/indent-blankline.nvim",
-        event = "VeryLazy",
-        main = "ibl",
-        ---@module "ibl"
-        ---@type ibl.config
-        opts = {},
+	{
+		"hiphish/rainbow-delimiters.nvim",
+		event = { "BufReadPre", "BufNewFile" },
+		config = function()
+			vim.g.rainbow_delimiters = {
+				strategy = {
+					[""] = "rainbow-delimiters.strategy.global",
+					vim = "rainbow-delimiters.strategy.local",
+				},
+				query = {
+					[""] = "rainbow-delimiters",
+					lua = "rainbow-blocks",
+				},
+				priority = {
+					[""] = 110,
+					lua = 210,
+				},
+				highlight = {
+					"RainbowDelimiterViolet",
+					"RainbowDelimiterBlue",
+					"RainbowDelimiterCyan",
+					"RainbowDelimiterGreen",
+					"RainbowDelimiterYellow",
+					"RainbowDelimiterOrange",
+					"RainbowDelimiterRed",
+				},
+			}
 
-        config = function()
-            local highlight = {
-                "RainbowRed",
-                "RainbowYellow",
-                "RainbowBlue",
-                "RainbowOrange",
-                "RainbowGreen",
-                "RainbowViolet",
-                "RainbowCyan",
-            }
+			local colors = {
+				Violet = "#ffd700",
+				Blue = "#da70d6",
+				Cyan = "#87cefa",
+				Green = "#32cd32",
+				Yellow = "#ffa500",
+				Orange = "#00ced1",
+				Red = "#ff69b4",
+			}
 
-            local hooks = require "ibl.hooks"
-            -- create the highlight groups in the highlight setup hook, so they are reset
-            -- every time the colorscheme changes
-            hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-                vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#E06C75" })
-                vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#E5C07B" })
-                vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#61AFEF" })
-                vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#D19A66" })
-                vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#98C379" })
-                vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
-                vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
-            end)
+			for name, hex in pairs(colors) do
+				vim.api.nvim_set_hl(0, "RainbowDelimiter" .. name, { fg = hex })
+			end
+		end,
+	},
 
-            require("ibl").setup { indent = { highlight = highlight } }
-        end
-    },
+	{
+		"nvim-lualine/lualine.nvim",
+		event = "VeryLazy",
+		dependencies = {
+			"nvim-tree/nvim-web-devicons",
+			-- "NeogitOrg/neogit", -- Bỏ comment nếu bạn dùng Neogit
+			-- "sindrets/diffview.nvim", -- Bỏ comment nếu bạn dùng Diffview
+		},
+		config = function()
+			local function safe_require(name)
+				local ok, mod = pcall(require, name)
+				return ok and mod or nil
+			end
 
-    {
-        'hiphish/rainbow-delimiters.nvim',
-        event = { 'BufReadPre', 'BufNewFile' },
-        config = function()
-            vim.g.rainbow_delimiters = {
-                strategy = {
-                    [''] = 'rainbow-delimiters.strategy.global',
-                    vim = 'rainbow-delimiters.strategy.local',
-                },
-                query = {
-                    [''] = 'rainbow-delimiters',
-                    lua = 'rainbow-blocks',
-                },
-                priority = {
-                    [''] = 110,
-                    lua = 210,
-                },
-                highlight = {
-                    'RainbowDelimiterViolet',
-                    'RainbowDelimiterBlue',
-                    'RainbowDelimiterCyan',
-                    'RainbowDelimiterGreen',
-                    'RainbowDelimiterYellow',
-                    'RainbowDelimiterOrange',
-                    'RainbowDelimiterRed',
-                },
-            }
+			local neogit = safe_require("neogit")
+			local diffview = safe_require("diffview")
 
-            local colors = {
-                Violet = "#ffd700",
-                Blue   = "#da70d6",
-                Cyan   = "#87cefa",
-                Green  = "#32cd32",
-                Yellow = "#ffa500",
-                Orange = "#00ced1",
-                Red    = "#ff69b4",
-            }
+			local function toggle_neogit()
+				if not neogit then
+					return
+				end
+				for _, win in ipairs(vim.api.nvim_list_wins()) do
+					local buf = vim.api.nvim_win_get_buf(win)
+					if vim.bo[buf].filetype:find("^Neogit") then
+						vim.api.nvim_win_close(win, false)
+						return
+					end
+				end
+				neogit.open({ kind = "tab" })
+			end
 
-            for name, hex in pairs(colors) do
-                vim.api.nvim_set_hl(0, "RainbowDelimiter" .. name, { fg = hex })
-            end
-        end,
-    },
-
-
-    -- {
-    --     "lukas-reineke/indent-blankline.nvim",
-    --     main = "ibl",
-    --     opts = function(_, opts)
-    --         -- Other blankline configuration here
-    --         return require("indent-rainbowline").make_opts(opts)
-    --     end,
-    --     dependencies = {
-    --         "TheGLander/indent-rainbowline.nvim",
-    --     },
-    -- }
-
-    {
-        "Mofiqul/vscode.nvim",
-        priority = 1000,
-        config = function()
-            local vscode = require("vscode")
-            vscode.setup({
-                italic_comments = true,
-                disable_nvimtree_bg = true,
-            })
-            vscode.load("dark")
-        end,
-    },
-
+			require("lualine").setup({
+				options = {
+					theme = "vscode",
+					icons_enabled = true,
+					globalstatus = true,
+					section_separators = { left = "", right = "" },
+					component_separators = { left = "", right = "" },
+					disabled_filetypes = { statusline = { "alpha", "dashboard", "neo-tree" } },
+				},
+				sections = {
+					lualine_a = { { "mode", icon = "" } },
+					lualine_b = {
+						{
+							"branch",
+							icon = "",
+							on_click = toggle_neogit,
+							cond = function()
+								return neogit ~= nil
+							end,
+						},
+						{
+							"diff",
+							symbols = { added = " ", modified = " ", removed = " " },
+							on_click = function()
+								diffview.open()
+							end,
+						},
+						{
+							"diagnostics",
+							sources = { "nvim_diagnostic" },
+							symbols = { error = " ", warn = " ", info = " ", hint = "󰌵 " },
+						},
+					},
+					lualine_c = {
+						{
+							"filename",
+							path = 1,
+							symbols = { modified = " ●", readonly = " ", unnamed = "[No Name]" },
+						},
+					},
+					lualine_x = { "encoding", "fileformat", "filetype" },
+					lualine_y = { "progress" },
+					lualine_z = { "location" },
+				},
+				inactive_sections = {
+					lualine_c = { "filename" },
+					lualine_x = { "location" },
+				},
+				extensions = { "neo-tree", "fugitive", "toggleterm", "lazy", "quickfix", "fzf" },
+			})
+		end,
+	},
 }

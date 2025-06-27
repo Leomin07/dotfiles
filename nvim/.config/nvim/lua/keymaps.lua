@@ -2,19 +2,23 @@ vim.g.mapleader = " "
 
 -- Map helper with silent=true by default
 local function map(mode, lhs, rhs, opts)
-    opts = vim.tbl_extend("force", { silent = true }, opts or {})
-    vim.keymap.set(mode, lhs, rhs, opts)
+	opts = vim.tbl_extend("force", { silent = true }, opts or {})
+	vim.keymap.set(mode, lhs, rhs, opts)
 end
 
 -- Save
 map("n", "<leader>w", "<CMD>update<CR>")
 
 -- Quick exit insert
-map("i", "jk", "<ESC>")
+-- map("i", "jk", "<ESC>")
 
 -- Splits
 map("n", "<leader>o", "<CMD>vsplit<CR>")
 map("n", "<leader>p", "<CMD>split<CR>")
+
+-- Close splits
+map("n", "<leader>c", "<CMD>close<CR>", { desc = "Close Current Split" })
+map("n", "<leader>co", "<CMD>only<CR>", { desc = "Close Other Splits" })
 
 -- Close buffer / quit
 map("n", "<C-w>", "<cmd>bd<cr>", { desc = "Close Current Buffer" })
@@ -29,29 +33,29 @@ map("n", "<C-a>", "ggVG")
 map("i", "<C-a>", "<Esc>ggVG")
 
 -- Clear search
-map("n", "<leader>h", ":nohlsearch<CR>")
+-- map("n", "<leader>h", ":nohlsearch<CR>")
 
 -- Window nav
-map("n", "<C-k>", "<C-w>k")
-map("n", "<C-j>", "<C-w>j")
-map("n", "<C-h>", "<C-w>h")
-map("n", "<C-l>", "<C-w>l")
+-- map("n", "<C-k>", "<C-w>k")
+-- map("n", "<C-j>", "<C-w>j")
+-- map("n", "<C-h>", "<C-w>h")
+-- map("n", "<C-l>", "<C-w>l")
 
 -- System clipboard: copy, cut, paste
 map({ "n", "v" }, "<C-c>", function()
-    if vim.fn.mode():match("[vV]") then
-        vim.cmd('normal! "+y')
-    else
-        vim.cmd('normal! "+yy')
-    end
+	if vim.fn.mode():match("[vV]") then
+		vim.cmd('normal! "+y')
+	else
+		vim.cmd('normal! "+yy')
+	end
 end, { desc = "󰅍 Copy to clipboard" })
 
 map({ "n", "v" }, "<C-x>", function()
-    if vim.fn.mode():match("[vV]") then
-        vim.cmd('normal! "+d')
-    else
-        vim.cmd('normal! "+dd')
-    end
+	if vim.fn.mode():match("[vV]") then
+		vim.cmd('normal! "+d')
+	else
+		vim.cmd('normal! "+dd')
+	end
 end, { desc = "󰅎 Cut to clipboard" })
 
 map({ "n", "v" }, "<C-v>", '"+p', { desc = "󰅏 Paste from clipboard" })
@@ -86,31 +90,32 @@ map("t", "<esc>", [[<C-\><C-n>]], { desc = "Exit Terminal Mode" })
 
 -- Run current file with F6
 map("n", "<F6>", function()
-    local ft = vim.bo.filetype
-    local file = vim.fn.expand("%")
-    local bin = vim.fn.expand("%:t:r")
+	local ft = vim.bo.filetype
+	local file = vim.fn.expand("%")
+	local bin = vim.fn.expand("%:t:r")
 
-    local cmd = {
-        python = "python3 " .. file,
-        javascript = "node " .. file,
-        typescript = "ts-node " .. file,
-        sh = "bash " .. file,
-        go = "go run " .. file,
-        c = string.format("gcc %s -o /tmp/%s && /tmp/%s", file, bin, bin),
-    }
+	local cmd = {
+		python = "python3 " .. file,
+		javascript = "node " .. file,
+		typescript = "ts-node " .. file,
+		sh = "bash " .. file,
+		go = "go run " .. file,
+		c = string.format("gcc %s -o /tmp/%s && /tmp/%s", file, bin, bin),
+	}
 
-    local run = cmd[ft]
-    if run then
-        require("toggleterm.terminal").Terminal:new({
-            cmd = run,
-            direction = "float",
-            close_on_exit = false,
-        }):toggle()
-    else
-        vim.notify("⚠ No run command for filetype: " .. ft, vim.log.levels.WARN)
-    end
+	local run = cmd[ft]
+	if run then
+		require("toggleterm.terminal").Terminal
+			:new({
+				cmd = run,
+				direction = "float",
+				close_on_exit = false,
+			})
+			:toggle()
+	else
+		vim.notify("⚠ No run command for filetype: " .. ft, vim.log.levels.WARN)
+	end
 end, { desc = "󰑊 Run Current File" })
-
 
 -- Delete current line (normal mode)
 vim.keymap.set("n", "<C-S-k>", "dd", { noremap = true, desc = "Delete Line" })
@@ -123,3 +128,11 @@ vim.keymap.set("v", "<C-S-k>", "d", { noremap = true, desc = "Delete Block" })
 
 -- Duplicate visual block (visual mode)
 vim.keymap.set("v", "<C-d>", "y`>p`<]", { noremap = true, desc = "Duplicate Block" })
+
+--Tab/Shift Tab Visual mode
+vim.keymap.set("v", "<Tab>", ">gv", { desc = "Indent line(s)" })
+vim.keymap.set("v", "<S-Tab>", "<gv", { desc = "Outdent line(s)" })
+
+--Tab/Shift+Tab normal mode
+vim.keymap.set("n", "<Tab>", ">>", { desc = "Indent line" })
+vim.keymap.set("n", "<S-Tab>", "<<", { desc = "Outdent line" })
