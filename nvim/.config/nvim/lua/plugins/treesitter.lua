@@ -1,5 +1,5 @@
 return {
-	"nvim-treesitter/nvim-treesitter",
+"nvim-treesitter/nvim-treesitter",
 	version = false, -- last release is way too old and doesn't work on Windows
 	build = ":TSUpdate",
 	event = { "VeryLazy" },
@@ -97,7 +97,6 @@ return {
 			end
 			opts.ensure_installed = unique
 		end
-
 		require("nvim-treesitter.configs").setup(opts)
 	end,
 }
