@@ -43,4 +43,3 @@ return {
 		end, { desc = "󰑊 Run Current File" })
 	end,
 }
-

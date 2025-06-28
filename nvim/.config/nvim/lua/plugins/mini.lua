@@ -50,7 +50,7 @@ return {
 				vim.cmd("norm " .. count .. "gcc")
 			end
 
-			vim.keymap.set({ "n", "x", "o" }, "<leader>/", toggle, {
+			vim.keymap.set({ "n", "x", "o" }, "<C-/>", toggle, {
 				remap = true,
 				desc = "[/] Toggle comment (VSCode style)",
 			})

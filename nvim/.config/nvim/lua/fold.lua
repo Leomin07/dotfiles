@@ -90,7 +90,5 @@ end
 vim.api.nvim_set_hl(0, "FoldedCount", { fg = "#7aa2f7", bg = "NONE", italic = true, bold = true })
 vim.opt.foldtext = "v:lua.HighlightedFoldtext()"
 -- This way, Neovim will NOT insert itself... anymore!
-
 -- Make sure fillchars doesn't have folds!
 vim.opt.fillchars:append({ fold = " " }) -- dspaces instead of periods
-
