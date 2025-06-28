@@ -70,4 +70,8 @@ vim.o.mouse = "a"
 vim.o.hlsearch = true
 vim.o.incsearch = true
 
+vim.o.scrolloff = 1 
+vim.o.sidescroll = 1
+vim.o.showcmd = true
 
+vim.o.cursorline = true 
