@@ -13,8 +13,8 @@ vim.opt.rtp:prepend(lazypath)
 
 require("vim-options")
 require("keymaps")
-require("fold") 
-
+require("fold")
+require("floatterm")
 
 require("lazy").setup("plugins")
 

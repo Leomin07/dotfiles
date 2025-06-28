@@ -59,42 +59,6 @@ return {
 		end,
 	},
 
-	-- {
-	-- 	"lukas-reineke/indent-blankline.nvim",
-	-- 	event = "VeryLazy",
-	-- 	main = "ibl",
-	-- 	---@module "ibl"
-	-- 	---@type ibl.config
-	-- 	opts = {},
-
-	-- 	config = function()
-	-- 		local highlight = {
-	-- 			"RainbowRed",
-	-- 			"RainbowYellow",
-	-- 			"RainbowBlue",
-	-- 			"RainbowOrange",
-	-- 			"RainbowGreen",
-	-- 			"RainbowViolet",
-	-- 			"RainbowCyan",
-	-- 		}
-
-	-- 		local hooks = require("ibl.hooks")
-	-- 		-- create the highlight groups in the highlight setup hook, so they are reset
-	-- 		-- every time the colorscheme changes
-	-- 		hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-	-- 			vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#E06C75" })
-	-- 			vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#E5C07B" })
-	-- 			vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#61AFEF" })
-	-- 			vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#D19A66" })
-	-- 			vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#98C379" })
-	-- 			vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
-	-- 			vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
-	-- 		end)
-
-	-- 		require("ibl").setup({ indent = { highlight = highlight } })
-	-- 	end,
-	-- },
-
 	{
 		"hiphish/rainbow-delimiters.nvim",
 		event = { "BufReadPre", "BufNewFile" },
@@ -144,8 +108,8 @@ return {
 		event = "VeryLazy",
 		dependencies = {
 			"nvim-tree/nvim-web-devicons",
-			-- "NeogitOrg/neogit", -- Bỏ comment nếu bạn dùng Neogit
-			-- "sindrets/diffview.nvim", -- Bỏ comment nếu bạn dùng Diffview
+			-- "NeogitOrg/neogit",
+			-- "sindrets/diffview.nvim",
 		},
 		config = function()
 			local function safe_require(name)
@@ -220,6 +184,37 @@ return {
 				},
 				extensions = { "neo-tree", "fugitive", "toggleterm", "lazy", "quickfix", "fzf" },
 			})
+		end,
+	},
+
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		event = "VeryLazy",
+		opts = {
+			indent = {
+				char = "▏", -- Thiner, not suitable when enable scope
+				tab_char = "▏",
+			},
+			scope = {
+				-- Rely on treesitter, bad performance
+				enabled = false,
+				-- highlight = highlight,
+			},
+		},
+		config = function(_, opts)
+			local ibl = require("ibl")
+			local hooks = require("ibl.hooks")
+
+			ibl.setup(opts)
+			hooks.register(hooks.type.SCOPE_HIGHLIGHT, hooks.builtin.scope_highlight_from_extmark)
+
+			-- Hide first level indent, using `foldsep` to show it
+			hooks.register(hooks.type.VIRTUAL_TEXT, function(_, _, _, virt_text)
+				if virt_text[1] and virt_text[1][1] == opts.indent.char then
+					virt_text[1] = { " ", { "@ibl.whitespace.char.1" } }
+				end
+				return virt_text
+			end)
 		end,
 	},
 }
