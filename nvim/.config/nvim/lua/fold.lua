@@ -1,60 +1,94 @@
--- Foldtext
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+-- -- Foldtext
+-- vim.opt.foldmethod = "expr"
+-- vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+-- vim.o.foldenable = true
+-- vim.o.foldlevel = 99
+-- vim.o.foldlevelstart = 99
+-- vim.opt.foldcolumn = "auto:9"
+-- -- vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
+
+
+vim.o.foldtext = ''
+vim.o.termguicolors = true
+vim.o.laststatus = 3
+
+
+-- vim.opt.fillchars = {
+--   vert = '│',
+--   foldclose = '',
+--   foldopen = '',
+--   foldsep = ' ',
+--   eob = ' ',
+--   sep= "▕"
+-- }
+
+-- vim.wo.colorcolumn = '99999'
+
+vim.o.number = true
+vim.o.relativenumber = true
+vim.o.signcolumn = 'yes'
+vim.o.foldmethod = 'expr'
+vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.o.foldenable = true
-vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
-vim.opt.foldcolumn = "auto:9"
--- vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
+vim.o.foldcolumn = '1'
+
 
 -- highlights fold
-function HighlightedFoldtext()
-	local start = vim.v.foldstart
-	local end_ = vim.v.foldend
-	local folded_lines = end_ - start + 1
+-- Highlighted foldtext using Treesitter, with line count at the end
+-- Custom foldtext: only show first line (with highlight) and count of folded lines
+-- Custom foldtext: only show first line (highlighted) and folded count, NO dots!
 
-	local line = vim.api.nvim_buf_get_lines(0, start - 1, start, false)[1] or ""
-	local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
-	local parser = vim.treesitter.get_parser(0, lang)
-	local query = vim.treesitter.query.get(parser:lang(), "highlights")
+function _G.HighlightedFoldtext()
+  local start = vim.v.foldstart
+  local end_ = vim.v.foldend
+  local folded_lines = end_ - start + 1
 
-	if not query then
-		return vim.fn.foldtext()
-	end
+  -- Get the first row of the fold
+  local line = vim.api.nvim_buf_get_lines(0, start - 1, start, false)[1] or ""
 
-	local tree = parser:parse({ start - 1, start })[1]
-	local result = {}
-	local line_pos = 0
-	local prev_range = nil
+  -- Treesitter highlight for first row
+  local ft = vim.bo.filetype
+  local lang = vim.treesitter.language.get_lang(ft)
+  local parser = vim.treesitter.get_parser(0, lang)
+  local query = vim.treesitter.query.get(parser:lang(), "highlights")
 
-	for id, node in query:iter_captures(tree:root(), 0, start - 1, start) do
-		local name = query.captures[id]
-		local srow, scol, erow, ecol = node:range()
-		if srow == start - 1 and erow == start - 1 then
-			local range = { scol, ecol }
-			if scol > line_pos then
-				table.insert(result, { line:sub(line_pos + 1, scol), "Folded" })
-			end
-			line_pos = ecol
-			local text = vim.treesitter.get_node_text(node, 0)
-			if prev_range and range[1] == prev_range[1] and range[2] == prev_range[2] then
-				result[#result] = { text, "@" .. name }
-			else
-				table.insert(result, { text, "@" .. name })
-			end
-			prev_range = range
-		end
-	end
+  if not query then
+    -- fallback: no syntax highlighting
+    return line .. ("  ↙ %d"):format(folded_lines)
+  end
 
-	if line_pos < #line then
-		table.insert(result, { line:sub(line_pos + 1), "Folded" })
-	end
+  local tree = parser:parse({ start - 1, start })[1]
+  local row = start - 1
+  local highlights = {}
+  local line_pos = 0
 
-	table.insert(result, { ("  ↙ %d  "):format(folded_lines), "FoldedCount" })
+  for id, node in query:iter_captures(tree:root(), 0, row, start) do
+    local name = query.captures[id]
+    local srow, scol, erow, ecol = node:range()
+    if srow == row and erow == row then
+      if scol > line_pos then
+        table.insert(highlights, { line:sub(line_pos + 1, scol), "Folded" })
+      end
+      local text = vim.treesitter.get_node_text(node, 0)
+      table.insert(highlights, { text, "@" .. name })
+      line_pos = ecol
+    end
+  end
+  -- remainder after last token
+  if line_pos < #line then
+    table.insert(highlights, { line:sub(line_pos + 1), "Folded" })
+  end
 
-	return result
+  -- Add fold line number at the end
+  table.insert(highlights, { ("  ↙ %d"):format(folded_lines), "FoldedCount" })
+
+  -- RETURN highlight list, NOT string!
+  return highlights
 end
 
 vim.api.nvim_set_hl(0, "FoldedCount", { fg = "#7aa2f7", bg = "NONE", italic = true, bold = true })
-
-vim.opt.foldtext = [[luaeval('HighlightedFoldtext()')]]
+vim.opt.foldtext = "v:lua.HighlightedFoldtext()"
+-- This way, Neovim will NOT insert itself... anymore!
+-- Make sure fillchars doesn't have folds!
+vim.opt.fillchars:append({ fold = " " }) -- dspaces instead of periods

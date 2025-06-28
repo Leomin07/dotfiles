@@ -18,16 +18,3 @@ require("floatterm")
 
 require("lazy").setup("plugins")
 
--- vim.diagnostic.config({
--- 	severity_sort = true,
--- 	virtual_text = {
--- 		severity = { min = vim.diagnostic.severity.INFO }, -- Không hiện HINT
--- 	},
--- 	signs = {
--- 		severity = { min = vim.diagnostic.severity.INFO }, -- Không hiện HINT
--- 	},
--- 	underline = {
--- 		severity = { min = vim.diagnostic.severity.INFO }, -- Không hiện HINT
--- 	},
--- 	-- update_in_insert = false,
--- })

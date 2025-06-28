@@ -36,10 +36,10 @@ map("i", "<C-a>", "<Esc>ggVG")
 -- map("n", "<leader>h", ":nohlsearch<CR>")
 
 -- Window nav
--- map("n", "<C-k>", "<C-w>k")
--- map("n", "<C-j>", "<C-w>j")
--- map("n", "<C-h>", "<C-w>h")
--- map("n", "<C-l>", "<C-w>l")
+map("n", "<C-k>", "<C-w>k")
+map("n", "<C-j>", "<C-w>j")
+map("n", "<C-h>", "<C-w>h")
+map("n", "<C-l>", "<C-w>l")
 
 -- System clipboard: copy, cut, paste
 map({ "n", "v" }, "<C-c>", function()
