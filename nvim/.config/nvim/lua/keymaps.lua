@@ -83,40 +83,6 @@ map("n", "<S-A-Down>", "yyP", { desc = "󰆏 Copy line below" })
 map("v", "<S-A-Up>", "y`<P`>]", { desc = "󰆐 Copy block above" })
 map("v", "<S-A-Down>", "y`>p`<]", { desc = "󰆏 Copy block below" })
 
--- Terminal toggle
-map("n", "<leader>t", "<cmd>ToggleTerm<CR>", { desc = "Toggle Terminal" })
-map("t", "<leader>t", "<cmd>close<CR>", { desc = "Hide Terminal" })
-map("t", "<esc>", [[<C-\><C-n>]], { desc = "Exit Terminal Mode" })
-
--- Run current file with F6
-map("n", "<F6>", function()
-	local ft = vim.bo.filetype
-	local file = vim.fn.expand("%")
-	local bin = vim.fn.expand("%:t:r")
-
-	local cmd = {
-		python = "python3 " .. file,
-		javascript = "node " .. file,
-		typescript = "ts-node " .. file,
-		sh = "bash " .. file,
-		go = "go run " .. file,
-		c = string.format("gcc %s -o /tmp/%s && /tmp/%s", file, bin, bin),
-	}
-
-	local run = cmd[ft]
-	if run then
-		require("toggleterm.terminal").Terminal
-			:new({
-				cmd = run,
-				direction = "float",
-				close_on_exit = false,
-			})
-			:toggle()
-	else
-		vim.notify("⚠ No run command for filetype: " .. ft, vim.log.levels.WARN)
-	end
-end, { desc = "󰑊 Run Current File" })
-
 -- Delete current line (normal mode)
 vim.keymap.set("n", "<C-S-k>", "dd", { noremap = true, desc = "Delete Line" })
 

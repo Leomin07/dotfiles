@@ -58,4 +58,3 @@ end
 vim.api.nvim_set_hl(0, "FoldedCount", { fg = "#7aa2f7", bg = "NONE", italic = true, bold = true })
 
 vim.opt.foldtext = [[luaeval('HighlightedFoldtext()')]]
-

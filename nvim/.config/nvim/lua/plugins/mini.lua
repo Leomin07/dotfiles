@@ -50,7 +50,7 @@ return {
 				vim.cmd("norm " .. count .. "gcc")
 			end
 
-			vim.keymap.set({ "n", "x", "o" }, "<leader>/", toggle, {
+			vim.keymap.set({ "n", "x", "o" }, "<C-/>", toggle, {
 				remap = true,
 				desc = "[/] Toggle comment (VSCode style)",
 			})
@@ -75,37 +75,36 @@ return {
 		end,
 	},
 
-	-- {
-	--  "echasnovski/mini.indentscope",
-	--  version = false,
-	--  event = "BufReadPost",
-	--  opts = {
-	--      symbol = "│",
-	--      options = { try_as_border = true },
-	--  },
-	--  config = function(_, opts)
-	--      local m = require("mini.indentscope")
+	{
+		"echasnovski/mini.indentscope",
+		version = false,
+		event = "BufReadPost",
+		opts = {
+			symbol = "│",
+			options = { try_as_border = true },
+		},
+		config = function(_, opts)
+			local m = require("mini.indentscope")
 
-	--      -- Disable for specific filetypes
-	--      vim.api.nvim_create_autocmd("FileType", {
-	--          pattern = {
-	--              "neo-tree",
-	--              "neotree",
-	--              "NvimTree", -- Nếu dùng NvimTree
-	--              "lazy", -- Plugin manager
-	--              "help", -- Help files
-	--              "dashboard", -- Nếu có dùng dashboard
-	--          },
-	--          callback = function()
-	--              vim.b.miniindentscope_disable = true
-	--          end,
-	--      })
+			-- Disable for specific filetypes
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = {
+					"neo-tree",
+					"neotree",
+					"NvimTree",
+					"lazy",
+					"help",
+					"dashboard",
+				},
+				callback = function()
+					vim.b.miniindentscope_disable = true
+				end,
+			})
 
-	--      m.setup(opts)
+			m.setup(opts)
 
-	--      local colors = { "#E06C75", "#E5C07B", "#98C379", "#56B5C1", "#61AFEF", "#C678DD" }
-	--      vim.api.nvim_set_hl(0, "MiniIndentScopeSymbol", { fg = colors[1] })
-	--  end,
-	-- },
-	--
+			local colors = { "#E06C75", "#E5C07B", "#98C379", "#56B5C1", "#61AFEF", "#C678DD" }
+			vim.api.nvim_set_hl(0, "MiniIndentScopeSymbol", { fg = colors[1] })
+		end,
+	},
 }
