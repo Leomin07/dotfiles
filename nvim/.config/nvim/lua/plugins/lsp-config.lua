@@ -99,6 +99,7 @@
 -- 						suggest = {
 -- 							completeFunctionCalls = true,
 -- 						},
+-- 						quotePreference = "auto",
 -- 					},
 -- 				},
 -- 			})
@@ -167,6 +168,7 @@
 -- 		ft = { "javascript", "typescript", "javascriptreact", "typescriptreact", "vue" },
 -- 	},
 -- }
+
 return {
 	-- Mason: LSP server installer
 	{

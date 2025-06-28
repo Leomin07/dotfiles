@@ -1,0 +1,13 @@
+keybind = ctrl+v=paste_from_clipboard
+font-family = JetBrainsMono Nerd Font
+font-size = 13
+
+cursor-style = block
+
+
+copy-on-select = clipboard
+
+
+window-width = 100
+window-height = 35
+window-padding-x = 4
