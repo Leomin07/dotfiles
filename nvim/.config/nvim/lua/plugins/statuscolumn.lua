@@ -14,13 +14,13 @@ return {
 						click = "v:lua.ScLa",
 					},
 					-- Fold icon
-					-- {
-					-- 	text = { builtin.foldfunc, " " },
-					-- 	hl = "FoldColumn",
-					-- 	wrap = true,
-					-- 	colwidth = 1,
-					-- 	click = "v:lua.ScFa",
-					-- },
+					{
+						text = { builtin.foldfunc, " " },
+						hl = "FoldColumn",
+						wrap = true,
+						colwidth = 1,
+						click = "v:lua.ScFa",
+					},
 					-- Diagnostic icon (custom)
 					{
 						text = {
@@ -44,17 +44,17 @@ return {
 						},
 						colwidth = 2,
 					},
-					{
-						text = {
-							function(args)
-								args.fold.close = " "
-								args.fold.open = " "
-								args.fold.sep = "▕ "
-								return builtin.foldfunc(args)
-							end,
-						},
-						click = "v:lua.ScFa",
-					},
+					-- {
+					-- 	text = {
+					-- 		function(args)
+					-- 			args.fold.close = " "
+					-- 			args.fold.open = " "
+					-- 			args.fold.sep = "▕ "
+					-- 			return builtin.foldfunc(args)
+					-- 		end,
+					-- 	},
+					-- 	click = "v:lua.ScFa",
+					-- },
 				},
 			})
 		end,

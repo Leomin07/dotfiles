@@ -99,6 +99,7 @@
 -- 						suggest = {
 -- 							completeFunctionCalls = true,
 -- 						},
+-- 						quotePreference = "auto",
 -- 					},
 -- 				},
 -- 			})
@@ -167,6 +168,7 @@
 -- 		ft = { "javascript", "typescript", "javascriptreact", "typescriptreact", "vue" },
 -- 	},
 -- }
+
 return {
 	-- Mason: LSP server installer
 	{
@@ -193,6 +195,7 @@ return {
 				"tailwindcss",
 				"yamlls",
 				"emmet_ls",
+				"bashls",
 			}
 
 			require("mason-lspconfig").setup({
@@ -260,6 +263,9 @@ return {
 				},
 			})
 
+			-- Bash
+			lspconfig.bashls.setup({ capabilities = capabilities })
+
 			-- HTML/CSS/JSON/YAML
 			for _, server in ipairs({ "html", "cssls", "jsonls", "yamlls" }) do
 				lspconfig[server].setup({ capabilities = capabilities })
@@ -292,6 +298,8 @@ return {
 					html = { options = { ["bem.enabled"] = true } },
 				},
 			})
+			-- Nix
+			-- lspconfig.rnix.setup({ capabilities = capabilities })
 
 			-- Keymap giống VSCode
 			local map = vim.keymap.set
@@ -326,6 +334,5 @@ return {
 			"neovim/nvim-lspconfig",
 		},
 		opts = {},
-
 	},
 }
