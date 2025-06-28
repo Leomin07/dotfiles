@@ -255,6 +255,7 @@ return {
 							"**/.next/**",
 							"**/dist/**",
 						},
+						quotePreference = "auto",
 					},
 				},
 			})

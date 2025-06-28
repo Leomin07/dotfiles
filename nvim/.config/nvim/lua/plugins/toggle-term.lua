@@ -2,7 +2,7 @@ return {
 	"akinsho/toggleterm.nvim",
 	config = function()
 		require("toggleterm").setup({
-			size = 20,
+			-- size = 20,
 			direction = "float",
 			start_in_insert = true,
 		})
