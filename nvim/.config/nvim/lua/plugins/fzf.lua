@@ -8,21 +8,21 @@ return {
 	config = function()
 		local fzf = require("fzf-lua")
 		fzf.setup({
-			winopts = {
-				height = 0.85,
-				width = 0.90,
-				preview = {
-					layout = "horizontal",
-				},
-			},
+			-- winopts = {
+			-- 	height = 0.85,
+			-- 	width = 0.90,
+			-- 	preview = {
+			-- 		layout = "horizontal",
+			-- 	},
+			-- },
 			fzf_colors = {
 				true,
 				bg = "-1",
 				gutter = "-1",
 			},
-			keymap = {
-				fzf = { ["ctrl-q"] = "select-all+accept" },
-			},
+			-- keymap = {
+			-- 	fzf = { ["ctrl-q"] = "select-all+accept" },
+			-- },
 			grep = {
 				-- Similar to VS Code, respect .gitignore, show line numbers, no heading (handled by fzf-lua)
 				-- --hidden is for hidden files/directories. Adjust if you don't want this by default.

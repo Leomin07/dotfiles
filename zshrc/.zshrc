@@ -13,6 +13,7 @@ export LANG=en_US.UTF-8
 alias gc="git commit -m"
 alias gca="git commit -a -m"
 alias gp="git push origin HEAD"
+alias ggf="git push -f"
 alias gpu="git pull origin"
 alias gst="git status"
 alias glog="git log --graph --topo-order --pretty='%w(100,0,6)%C(yellow)%h%C(bold)%C(black)%d %C(cyan)%ar %C(green)%an%n%C(bold)%C(white)%s %N' --abbrev-commit"
@@ -35,14 +36,14 @@ alias ......="cd ../../../../.."
 
 # Input method
 # fcitx5
-export GTK_IM_MODULE=fcitx5
-export QT_IM_MODULE=fcitx5
-export XMODIFIERS="@im=fcitx5"
+# export GTK_IM_MODULE=fcitx5
+# export QT_IM_MODULE=fcitx5
+# export XMODIFIERS="@im=fcitx5"
 
 # Ibus bamboo
-# export GTK_IM_MODULE=ibus
-# export QT_IM_MODULE=ibus
-# export XMODIFIERS="@im=ibus"
+export GTK_IM_MODULE=ibus
+export QT_IM_MODULE=ibus
+export XMODIFIERS="@im=ibus"
 
 # Neovim for linux-mint
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"

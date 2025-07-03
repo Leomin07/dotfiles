@@ -22,6 +22,5 @@ find ./ -name ".DS_Store" -type f -delete
 ```
 rm ~/.local/share/nvim
 ```
-### head1
 
-
+### test
