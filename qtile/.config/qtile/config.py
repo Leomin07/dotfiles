@@ -1,509 +1,418 @@
-#   ___ _____ ___ _     _____    ____             __ _
-#  / _ \_   _|_ _| |   | ____|  / ___|___  _ __  / _(_) __ _
-# | | | || |  | || |   |  _|   | |   / _ \| '_ \| |_| |/ _` |
-# | |_| || |  | || |___| |___  | |__| (_) | | | |  _| | (_| |
-#  \__\_\|_| |___|_____|_____|  \____\___/|_| |_|_| |_|\__, |
-#                                                      |___/
+    
+#       █████████     ███████    ███████████ █████ █████ ███████████ █████ █████       ██████████
+#      ███░░░░░███  ███░░░░░███ ░█░░░░░░███ ░░███ ░░███ ░█░░░███░░░█░░███ ░░███       ░░███░░░░░█
+#     ███     ░░░  ███     ░░███░     ███░   ░░███ ███  ░   ░███  ░  ░███  ░███        ░███  █ ░ 
+#    ░███         ░███      ░███     ███      ░░█████       ░███     ░███  ░███        ░██████   
+#    ░███         ░███      ░███    ███        ░░███        ░███     ░███  ░███        ░███░░█   
+#    ░░███     ███░░███     ███   ████     █    ░███        ░███     ░███  ░███      █ ░███ ░   █
+#     ░░█████████  ░░░███████░   ███████████    █████       █████    █████ ███████████ ██████████
+#      ░░░░░░░░░     ░░░░░░░    ░░░░░░░░░░░    ░░░░░       ░░░░░    ░░░░░ ░░░░░░░░░░░ ░░░░░░░░░░ 
+#
+#                                                                                    - DARKKAL44
+  
 
-# Icons: https://fontawesome.com/search?o=r&m=free
 
-import os
-import re
-import socket
-import subprocess
-
-# import psutil
-import json
-from libqtile import hook
-from libqtile import qtile
-from typing import List
-from libqtile import bar, layout, widget
-from libqtile.config import (
-    Click,
-    Drag,
-    Group,
-    Key,
-    Match,
-    Screen,
-    ScratchPad,
-    DropDown,
-    KeyChord,
-)
+from libqtile import bar, layout, widget, hook, qtile
+from libqtile.config import Click, Drag, Group, Key, Match, hook, Screen, KeyChord
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
-from libqtile.widget import Spacer, Backlight
-from libqtile.widget.image import Image
 from libqtile.dgroups import simple_key_binder
-from pathlib import Path
-from libqtile.log_utils import logger
+from time import sleep
 
-from qtile_extras import widget
-from qtile_extras.widget.decorations import RectDecoration
-from qtile_extras.widget.decorations import PowerLineDecoration
-
-# --------------------------------------------------------
-# Your configuration
-# --------------------------------------------------------
-
-# Keyboard layout in autostart.sh
-
-# Show wlan status bar widget (set to False if wired network)
-# show_wlan = True
-show_wlan = False
-
-# Show bluetooth status bar widget
-# show_bluetooth = True
-show_bluetooth = False
-
-# --------------------------------------------------------
-# General Variables
-# --------------------------------------------------------
-
-# Get home path
-home = str(Path.home())
-
-# --------------------------------------------------------
-# Check for Desktop/Laptop
-# --------------------------------------------------------
-
-# 3 = Desktop
-platform = int(os.popen("cat /sys/class/dmi/id/chassis_type").read())
-
-# --------------------------------------------------------
-# Set default apps
-# --------------------------------------------------------
-
+mod = "mod4"
 terminal = "alacritty"
 
-# --------------------------------------------------------
-# Keybindings
-# --------------------------------------------------------
+# █▄▀ █▀▀ █▄█ █▄▄ █ █▄░█ █▀▄ █▀
+# █░█ ██▄ ░█░ █▄█ █ █░▀█y █▄▀ ▄█
 
-mod = "mod4"  # SUPER KEY
+
+
 
 keys = [
-    # Reload config
-    Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
-    # volume
-    Key(
-        [],
-        "XF86AudioRaiseVolume",
-        lazy.spawn("pactl set-sink-volume @DEFAULT_SINK@ +5%"),
-    ),
-    Key(
-        [],
-        "XF86AudioLowerVolume",
-        lazy.spawn("pactl set-sink-volume @DEFAULT_SINK@ -5%"),
-    ),
-    Key([], "XF86AudioMute", lazy.spawn("pactl set-sink-mute @DEFAULT_SINK@ toggle")),
-    # Key([], "XF86AudioRaiseVolume", lazy.spawn("~/.config/qtile/scripts/volume_notify.sh up")),
-    # Key([], "XF86AudioLowerVolume", lazy.spawn("~/.config/qtile/scripts/volume_notify.sh down")),
-    # Key([], "XF86AudioMute", lazy.spawn("~/.config/qtile/scripts/volume_notify.sh mute")),
-    # Focus
-    Key([mod], "Left", lazy.layout.left(), desc="Move focus to left"),
-    Key([mod], "Right", lazy.layout.right(), desc="Move focus to right"),
-    Key([mod], "Down", lazy.layout.down(), desc="Move focus down"),
-    Key([mod], "Up", lazy.layout.up(), desc="Move focus up"),
-    Key(
-        [mod],
-        "space",
-        lazy.layout.next(),
-        desc="Move window focus to other window around",
-    ),
-    # Move
-    Key(
-        [mod, "shift"],
-        "Left",
-        lazy.layout.shuffle_left(),
-        desc="Move window to the left",
-    ),
-    Key(
-        [mod, "shift"],
-        "Right",
-        lazy.layout.shuffle_right(),
-        desc="Move window to the right",
-    ),
-    Key([mod, "shift"], "Down", lazy.layout.shuffle_down(), desc="Move window down"),
-    Key([mod, "shift"], "Up", lazy.layout.shuffle_up(), desc="Move window up"),
-    # Swap
-    Key([mod, "shift"], "h", lazy.layout.swap_left()),
-    Key([mod, "shift"], "l", lazy.layout.swap_right()),
-    # Key([mod], "Print", lazy.spawn(home + "/.config/qtile/scripts/screenshot.sh")),
-    # Size
-    Key([mod, "control"], "Down", lazy.layout.shrink(), desc="Grow window to the left"),
-    Key([mod, "control"], "Up", lazy.layout.grow(), desc="Grow window to the right"),
-    Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
-    # Floating
-    Key([mod], "t", lazy.window.toggle_floating(), desc="Toggle floating"),
-    # Split
+
+#  D E F A U L T
+
+    # focus window
+    Key([mod], "left", lazy.layout.left(), desc="Move focus to left"),
+    Key([mod], "right", lazy.layout.right(), desc="Move focus to right"),
+    Key([mod], "down", lazy.layout.down(), desc="Move focus down"),
+    Key([mod], "up", lazy.layout.up(), desc="Move focus up"),
+    Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
+
+    # move window
+    Key([mod, "control"], "left", lazy.layout.shuffle_left(), desc="Move window to the left"),
+    Key([mod, "control"], "right", lazy.layout.shuffle_right(), desc="Move window to the right"),
+    Key([mod, "control"], "down", lazy.layout.shuffle_down(), desc="Move window down"),
+    Key([mod, "control"], "up", lazy.layout.shuffle_up(), desc="Move window up"),
+
+    # grow/shrink window
+    Key([mod, "shift"], "left", lazy.layout.grow_left(), desc="Grow window to the left"),
+    Key([mod, "shift"], "right", lazy.layout.grow_right(), desc="Grow window to the right"),
+    Key([mod, "shift"], "down", lazy.layout.grow_down(), desc="Grow window down"),
+    Key([mod, "shift"], "up", lazy.layout.grow_up(), desc="Grow window up"),
+    
+    Key([mod], "f", lazy.window.toggle_fullscreen()),
     Key(
         [mod, "shift"],
         "Return",
         lazy.layout.toggle_split(),
         desc="Toggle between split and unsplit sides of stack",
     ),
-    # Toggle Layouts
+    Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
-    # Fullscreen
-    Key([mod], "f", lazy.window.toggle_fullscreen()),
-    # System
     Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
     Key([mod, "shift"], "r", lazy.reload_config(), desc="Reload the config"),
-    Key(
-        [mod, "control"],
-        "q",
-        lazy.spawn(home + "/.config/qtile/scripts/powermenu.sh"),
-        desc="Open Powermenu",
-    ),
-    # Apps
-    Key([mod], "Return", lazy.spawn("alacritty"), desc="Launch terminal"),
-    Key([mod, "control"], "Return", lazy.spawn("rofi -show drun"), desc="Launch Rofi"),
-    Key([mod], "b", lazy.spawn("google-chrome-stable"), desc="Launch Browser"),
-    # Key([mod, "shift"], "w", lazy.spawn(home + "/.config/qtile/scripts/wallpaper.sh"), desc="Update Theme and Wallpaper"),
-    # Key([mod, "control"], "w", lazy.spawn(home + "/.config/qtile/scripts/wallpaper.sh select"), desc="Select Theme and Wallpaper"),
-    # Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl -q s +20%")),
-    # Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl -q s 20%-"))
-    Key(
-        [mod, "shift"],
-        "p",
-        lazy.spawn("~/.config/qtile/scripts/powermenu.sh"),
-        desc="Power Menu",
-    ),
+    Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
+
+# C U S T O M
+
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("pactl set-sink-volume 0 +5%"), desc='Volume Up'),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("pactl set-sink-volume 0 -5%"), desc='volume down'),
+    Key([], "XF86AudioMute", lazy.spawn("pulsemixer --toggle-mute"), desc='Volume Mute'),
+    Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause"), desc='playerctl'),
+    Key([], "XF86AudioPrev", lazy.spawn("playerctl previous"), desc='playerctl'),
+    Key([], "XF86AudioNext", lazy.spawn("playerctl next"), desc='playerctl'),
+    Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl s 10%+"), desc='brightness UP'),
+    Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl s 10%-"), desc='brightness Down'),
+	Key([mod], "h", lazy.spawn("roficlip"), desc='clipboard'),
+    Key([mod], "s", lazy.spawn("flameshot gui"), desc='Screenshot'),
+    # Key([mod], "r", lazy.spawn("sh -c ~/.config/rofi/scripts/launcher"), desc="Spawn a command using a prompt widget"),
+    Key([mod], "p", lazy.spawn("sh -c ~/.config/rofi/scripts/power"), desc='powermenu'),
+    # Key([mod], "t", lazy.spawn("sh -c ~/.config/rofi/scripts/theme_switcher"), desc='theme_switcher'),
+    Key([mod], "e", lazy.spawn("nemo"), desc="Launch Nemo file manager"),
+    Key([mod], "b", lazy.spawn("thorium-browser"), desc="Launch Thorium browser"), 
+    Key([mod], "c", lazy.spawn("code"), desc="Launch VS Code"),
+
 ]
 
-# --------------------------------------------------------
-# Groups
-# --------------------------------------------------------
 
-groups = [
-    Group("1", layout="monadtall"),
-    Group("2", layout="monadtall"),
-    Group("3", layout="monadtall"),
-    Group("4", layout="monadtall"),
-    Group("5", layout="monadtall"),
-]
 
-dgroups_key_binder = simple_key_binder(mod)
+# █▀▀ █▀█ █▀█ █░█ █▀█ █▀
+# █▄█ █▀▄ █▄█ █▄█ █▀▀ ▄█
 
-# --------------------------------------------------------
-# Scratchpads
-# --------------------------------------------------------
 
-# groups.append(ScratchPad("6", [
-#     DropDown("chatgpt", lazy.spawn("bash " + home + "/.config/ml4w/settings/ai.sh"), x=0.3, y=0.1, width=0.40, height=0.4, on_focus_lost_hide=False ),
-#     DropDown("mousepad", "mousepad", x=0.3, y=0.1, width=0.40, height=0.4, on_focus_lost_hide=False ),
-#     DropDown("terminal", "alacritty", x=0.3, y=0.1, width=0.40, height=0.4, on_focus_lost_hide=False ),
-#     DropDown("scrcpy", "scrcpy -d", x=0.8, y=0.05, width=0.15, height=0.6, on_focus_lost_hide=False )
-# ]))
 
-# keys.extend([
-#     Key([mod], 'F10', lazy.group["6"].dropdown_toggle("chatgpt")),
-#     Key([mod], 'F11', lazy.group["6"].dropdown_toggle("mousepad")),
-#     Key([mod], 'F12', lazy.group["6"].dropdown_toggle("terminal")),
-#     Key([mod], 'F9', lazy.group["6"].dropdown_toggle("scrcpy"))
-# ])
+groups = [Group(f"{i+1}", label="") for i in range(8)]
 
-# --------------------------------------------------------
-# Pywal Colors
-# --------------------------------------------------------
+for i in groups:
+    keys.extend(
+            [
+                Key(
+                    [mod],
+                    i.name,
+                    lazy.group[i.name].toscreen(),
+                    desc="Switch to group {}".format(i.name),
+                    ),
+                Key(
+                    [mod, "shift"],
+                    i.name,
+                    lazy.window.togroup(i.name, switch_group=True),
+                    desc="Switch to & move focused window to group {}".format(i.name),
+                    ),
+                ]
+            )
 
-colors = os.path.expanduser("~/.config/qtile/wal/colors.json")
-colordict = json.load(open(colors))
-Color0 = colordict["colors"]["color0"]
-Color1 = colordict["colors"]["color1"]
-Color2 = colordict["colors"]["color2"]
-Color3 = colordict["colors"]["color3"]
-Color4 = colordict["colors"]["color4"]
-Color5 = colordict["colors"]["color5"]
-Color6 = colordict["colors"]["color6"]
-Color7 = colordict["colors"]["color7"]
-Color8 = colordict["colors"]["color8"]
-Color9 = colordict["colors"]["color9"]
-Color10 = colordict["colors"]["color10"]
-Color11 = colordict["colors"]["color11"]
-Color12 = colordict["colors"]["color12"]
-Color13 = colordict["colors"]["color13"]
-Color14 = colordict["colors"]["color14"]
-Color15 = colordict["colors"]["color15"]
 
-# --------------------------------------------------------
-# Setup Layout Theme
-# --------------------------------------------------------
 
-layout_theme = {
-    "border_width": 3,
-    "margin": 15,
-    "border_focus": Color2,
-    "border_normal": "FFFFFF",
-    "single_border_width": 3,
+
+# L A Y O U T S
+
+
+
+lay_config = {
+    "border_width": 0,
+    "margin": 9,
+    "border_focus": "3b4252",
+    "border_normal": "3b4252",
+    "font": "FiraCode Nerd Font",
+    "grow_amount": 2,
 }
-
-# --------------------------------------------------------
-# Layouts
-# --------------------------------------------------------
 
 layouts = [
-    layout.Max(**layout_theme),
-    layout.MonadTall(**layout_theme),
-    layout.MonadWide(**layout_theme),
-    layout.RatioTile(**layout_theme),
-    layout.Floating(),
+    # layout.MonadWide(**lay_config),
+    layout.Bsp(**lay_config, fair=False, border_on_single=True),
+    layout.Columns(
+        **lay_config,
+        border_on_single=True,
+        num_columns=2,
+        split=False,
+    ),
+    # Plasma(lay_config, border_normal_fixed='#3b4252', border_focus_fixed='#3b4252', border_width_single=3),
+    # layout.RatioTile(**lay_config),
+    # layout.VerticalTile(**lay_config),
+    # layout.Matrix(**lay_config, columns=3),
+    # layout.Zoomy(**lay_config),
+    # layout.Slice(**lay_config, width=1920, fallback=layout.TreeTab(), match=Match(wm_class="joplin"), side="right"),
+    # layout.MonadTall(**lay_config),
+    # layout.Tile(shift_windows=True, **lay_config),
+    # layout.Stack(num_stacks=2, **lay_config),
+    layout.Floating(**lay_config),
+    layout.Max(**lay_config),
 ]
 
-# --------------------------------------------------------
-# Setup Widget Defaults
-# --------------------------------------------------------
 
-widget_defaults = dict(font="JetBrainsMono Nerd Font", fontsize=14, padding=3)
-extension_defaults = widget_defaults.copy()
 
-# --------------------------------------------------------
-# Decorations
-# https://qtile-extras.readthedocs.io/en/stable/manual/how_to/decorations.html
-# --------------------------------------------------------
+widget_defaults = dict(
+    font="sans",
+    fontsize=12,
+    padding=3,
+)
+extension_defaults = [ widget_defaults.copy()
+        ]
 
-decor_left = {
-    "decorations": [
-        PowerLineDecoration(
-            path="arrow_left"
-            # path="rounded_left"
-            # path="forward_slash"
-            # path="back_slash"
-        )
-    ],
-}
 
-decor_right = {
-    "decorations": [
-        PowerLineDecoration(
-            path="arrow_right"
-            # path="rounded_right"
-            # path="forward_slash"
-            # path="back_slash"
-        )
-    ],
-}
 
-# --------------------------------------------------------
-# Widgets
-# --------------------------------------------------------
+def search():
+    qtile.cmd_spawn("rofi -show drun")
 
-widget_list = [
-    widget.TextBox(
-        **decor_left,
-        background=Color1 + ".4",
-        text="Apps",
-        foreground="ffffff",
-        desc="",
-        padding=10,
-        mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("rofi -show drun")},
-    ),
-    # widget.TextBox(
-    #     **decor_left,
-    #     background="#ffffff.4",
-    #     text="  ",
-    #     foreground="000000.6",
-    #     fontsize=18,
-    #     mouse_callbacks={"Button1": lambda: qtile.cmd_spawn(home + "/.config/qtile/scripts/wallpaper.sh select")},
-    # ),
-    widget.GroupBox(
-        **decor_left,
-        background="#ffffff.7",
-        highlight_method="block",
-        highlight="ffffff",
-        block_border="ffffff",
-        highlight_color=["ffffff", "ffffff"],
-        block_highlight_text_color="000000",
-        foreground="ffffff",
-        rounded=False,
-        this_current_screen_border="ffffff",
-        active="ffffff",
-    ),
-    # widget.TextBox(
-    #     **decor_left,
-    #     background="#ffffff.4",
-    #     text=" ",
-    #     foreground="000000.6",
-    #     fontsize=18,
-    #     mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("bash " + home + "/.config/ml4w/settings/browser.sh")},
-    # ),
-    widget.TextBox(
-        **decor_left,
-        background="#ffffff.4",
-        text=" ",
-        foreground="000000.6",
-        fontsize=18,
-        mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("nautilus")},
-    ),
-    widget.WindowName(
-        **decor_left, max_chars=50, background=Color2 + ".4", width=400, padding=10
-    ),
-    widget.Spacer(),
-    widget.Clock(
-        # **decor_right,
-        background=Color4 + ".4",
-        padding=10,
-        format="%Y-%m-%d / %H:%M",
-    ),
-    # widget.Spacer(),
-    # widget.TextBox(**decor_right, background="#000000.3"),
-    # widget.CPU(
-    #     # format=" {load_percent:04}%",
-    #     format='CPU: {load_percent:.0f}%',
-    #     background=Color9+".4",
-    # ),
-    # CPU Usage
-    widget.CPU(
-        format="CPU: {load_percent}%",
-        update_interval=3,
-        background=Color3 + ".3",  # màu nền từ pywal
-        foreground="ffffff",
-        padding=10,
-    ),
-    # CPU Temperature
-    widget.ThermalSensor(
-        # tag_sensor="Package id 0",  # đổi theo cảm biến của máy bạn
-        threshold=90,  # nhiệt độ cảnh báo
-        foreground_alert="ff5555",  # màu chữ khi quá nóng
-        foreground="ffffff",
-        background=Color4 + ".3",
-        # format="🌡 {temp}°C",
-        # format="{tag}: {temp:.0f}{unit}",
-        format="CPU: {temp:.0f}{unit}",
-        padding=10,
-        update_interval=3,
-    ),
-    widget.Memory(
-        # **decor_right,
-        background=Color10 + ".4",
-        padding=10,
-        measure_mem="G",
-        # format="{MemUsed:.0f}{mm} ({MemTotal:.0f}{mm})"
-        format="RAM: {MemUsed:.1f}G/{MemTotal:.1f}G ({MemPercent:.0f}%)",
-    ),
-    # widget.Volume(
-    #     **decor_right,
-    #     background=Color12 + ".4",
-    #     padding=10,
-    #     fmt="Vol: {}",
-    # ),
-    # widget.KeyboardKbdd(configured_keyboards=["us", "vn"]),
-    widget.Volume(
-        emoji=True,
-        emoji_list=["🔇", "🔈", "🔉", "🔊"],
-        # format="🔊 {percent:2.0%}",
-        background=Color2 + ".3",
-        foreground="ffffff",
-        padding=10,
-        step=5,
-        update_interval=1.0,
-        fmt="<i>{}</i>",
-    ),
-    widget.DF(
-        # **decor_right,
-        padding=10,
-        background=Color8 + ".4",
-        visible_on_warn=False,
-        format="{p} {uf}{m} ({r:.0f}%)",
-    ),
-    # widget.Bluetooth(
-    #     **decor_right,
-    #     background=Color2+".4",
-    #     padding=10,
-    #     mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("blueman-manager")},
-    # ),
-    # widget.Wlan(
-    #     **decor_right,
-    #     background=Color2+".4",
-    #     padding=10,
-    #     format='{essid} {percent:2.0%}',
-    #     mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("alacritty -e nmtui")},
-    # ),
-    # widget.TextBox(
-    #     **decor_right,
-    #     background=Color2+".4",
-    #     padding=5,
-    #     text=" ",
-    #     fontsize=20,
-    #     mouse_callbacks={"Button1": lambda: qtile.cmd_spawn(home + "/.config/qtile/scripts/powermenu.sh")},
-    # ),
-    # widget.TextBox(
-    #     **decor_right,
-    #     text=" ",  # icon Power
-    #     padding=5,
-    #     fontsize=20,
-    #     mouse_callbacks={
-    #         "Button1": lambda: qtile.cmd_spawn(
-    #             home + "/.config/qtile/scripts/powermenu.sh"
-    #         ),
-    #     },
-    #     background=Color2 + "66",
-    # ),
-    widget.TextBox(
-        # **decor_right,
-        text=" ",  # icon Power
-        padding=5,
-        fontsize=20,
-        mouse_callbacks={
-            "Button1": lambda: qtile.cmd_spawn(
-                "rofi -show power-menu -modi power-menu:~/.config/rofi/rofi-power-menu"
-            ),
-        },
-        background=Color2 + "66",
-    ),
-    widget.Spacer(),
-]
+def power():
+    qtile.cmd_spawn("sh -c ~/.config/rofi/scripts/power")
 
-# Hide Modules if not on laptop
-if show_wlan == False:
-    del widget_list[13:14]
 
-if show_bluetooth == False:
-    del widget_list[12:13]
 
-# --------------------------------------------------------
-# Screens
-# --------------------------------------------------------
+
+# █▄▄ ▄▀█ █▀█
+# █▄█ █▀█ █▀▄
+
+
 
 screens = [
+
     Screen(
         top=bar.Bar(
-            widget_list,
+            [
+                widget.Spacer(length=15,
+                    background='#282738',
+                ),
+
+                widget.Image(
+                    filename='~/.config/qtile/Assets/launch_Icon.png',
+                    margin=2,
+                    background='#282738',
+                    mouse_callbacks={"Button1": power},
+                ),
+
+                widget.Image(
+                    filename='~/.config/qtile/Assets/6.png',
+                ),
+
+                widget.GroupBox(
+                    font="JetBrainsMono Nerd Font",
+                    fontsize=24,
+                    borderwidth=3,
+                    highlight_method='block',
+                    active='#CAA9E0',
+                    block_highlight_text_color="#91B1F0",
+                    highlight_color='#353446',
+                    inactive='#282738',
+                    foreground='#4B427E',
+                    background='#353446',
+                    this_current_screen_border='#353446',
+                    this_screen_border='#353446',
+                    other_current_screen_border='#353446',
+                    other_screen_border='#353446',
+                    urgent_border='#353446',
+                    rounded=True,
+                    disable_drag=True,
+                ),
+
+                widget.Spacer(
+                    length=8,
+                    background='#353446',
+                ),
+
+                widget.Image(
+                    filename='~/.config/qtile/Assets/1.png',
+                ),
+
+
+                widget.CurrentLayoutIcon(
+                    custom_icon_paths=["~/.config/qtile/Assets/layout"],
+                    background='#353446',
+                    scale=0.50,
+                ),
+
+                # widget.Image(
+                #     filename='~/.config/qtile/Assets/5.png',
+                # ),
+
+                # widget.TextBox(
+                #     text=" ",
+                #     font="Font Awesome 6 Free Solid",
+                #     fontsize=13,
+                #     background='#282738',
+                #     foreground='#CAA9E0',
+                #     mouse_callbacks={"Button1": search},
+                # ),
+
+                # widget.TextBox(
+                #     fmt='Search',
+                #     background='#282738',
+                #     font="JetBrainsMono Nerd Font Bold",
+                #     fontsize=13,
+                #     foreground='#CAA9E0',
+                #     mouse_callbacks={"Button1": search},
+                # ),
+
+                widget.Image(
+                    filename='~/.config/qtile/Assets/4.png',
+                ),
+
+                widget.WindowName(
+                    background='#353446',
+                    font="JetBrainsMono Nerd Font Bold",
+                    fontsize=13,
+                    empty_group_string="Desktop",
+                    max_chars=130,
+                    foreground='#CAA9E0',
+                ),
+
+                widget.Image(
+                    filename='~/.config/qtile/Assets/3.png',
+                ),
+
+                widget.Systray(
+                    background='#282738',
+                    fontsize=2,
+                ),
+
+                widget.TextBox(
+                    text=' ',
+                    background='#282738',
+                ),
+
+                widget.Image(
+                    filename='~/.config/qtile/Assets/6.png',
+                    background='#353446',
+                ),
+
+                widget.TextBox(
+                    text="",
+                    font="Font Awesome 6 Free Solid",
+                    fontsize=13,
+                    background='#353446',
+                    foreground='#CAA9E0',
+                ),
+
+                widget.Memory(
+                    background='#353446',
+                    format='{MemUsed: .0f}{mm}',
+                    foreground='#CAA9E0',
+                    font="JetBrainsMono Nerd Font Bold",
+                    fontsize=13,
+                    update_interval=5,
+                ),
+
+                widget.Image(
+                    filename='~/.config/qtile/Assets/2.png',
+                ),
+
+                widget.Spacer(
+                    length=8,
+                    background='#353446',
+                ),
+
+                widget.TextBox(
+                    text=" ",
+                    font="Font Awesome 6 Free Solid",
+                    fontsize=13,
+                    background='#353446',
+                    foreground='#CAA9E0',
+                ),
+
+                # widget.Battery(
+                #     font="JetBrainsMono Nerd Font Bold",
+                #     fontsize=13,
+                #     background='#353446',
+                #     foreground='#CAA9E0',
+                #     format='{percent:2.0%}',
+                # ),
+
+                # widget.Image(
+                #     filename='~/.config/qtile/Assets/2.png',
+                # ),
+
+                widget.Spacer(
+                    length=8,
+                    background='#353446',
+                ),
+
+                widget.TextBox(
+                    text=" ",
+                    font="Font Awesome 6 Free Solid",
+                    fontsize=13,
+                    background='#353446',
+                    foreground='#CAA9E0',
+                ),
+
+				widget.Volume(
+					font="JetBrainsMono Nerd Font Bold",
+					fontsize=13,
+                    background='#353446',
+                    foreground='#CAA9E0',
+					mute_command="pamixer --toggle-mute",
+					volume_up_command="pamixer -i 5",
+					volume_down_command="pamixer -d 5",
+					get_volume_command="pamixer --get-volume-human",
+					update_interval=0.2,
+					unmute_format="{volume}%",
+					mute_format="M",
+				),
+
+                widget.Image(
+                    filename='~/.config/qtile/Assets/5.png',
+                    background='#353446',
+                ),
+
+                widget.TextBox(
+                    text=" ",
+                    font="Font Awesome 6 Free Solid",
+                    fontsize=13,
+                    background='#282738',
+                    foreground='#CAA9E0',
+                ),
+
+                widget.Clock(
+                    format='%I:%M %p',
+                    background='#282738',
+                    foreground='#CAA9E0',
+                    font="JetBrainsMono Nerd Font Bold",
+                    fontsize=13,
+                ),
+
+                widget.Spacer(
+                    length=18,
+                    background='#282738',
+                ),
+
+            ],
             30,
-            padding=20,
-            opacity=0.7,
-            border_width=[0, 0, 0, 0],
-            margin=[0, 0, 0, 0],
-            background="#000000.3",
+            border_color='#282738',
+            border_width=[0,0,0,0],
+            margin=[15,60,6,60],
+
         ),
     ),
 ]
 
-# --------------------------------------------------------
-# Drag floating layouts
-# --------------------------------------------------------
 
+
+# Drag floating layouts.
 mouse = [
-    Drag(
-        [mod],
-        "Button1",
-        lazy.window.set_position_floating(),
-        start=lazy.window.get_position(),
-    ),
-    Drag(
-        [mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()
-    ),
+    Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
+    Drag([mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
     Click([mod], "Button2", lazy.window.bring_to_front()),
 ]
 
-# --------------------------------------------------------
-# Define floating layouts
-# --------------------------------------------------------
-
+dgroups_key_binder = None
+dgroups_app_rules = []  # type: list
+follow_mouse_focus = True
+bring_front_click = False
+cursor_warp = False
 floating_layout = layout.Floating(
-    border_width=3,
-    border_focus=Color2,
-    border_normal="FFFFFF",
+	border_focus='#1F1D2E',
+	border_normal='#1F1D2E',
+	border_width=0,
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
         *layout.Floating.default_float_rules,
@@ -513,17 +422,19 @@ floating_layout = layout.Floating(
         Match(wm_class="ssh-askpass"),  # ssh-askpass
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
-    ],
+    ]
 )
 
-# --------------------------------------------------------
-# General Setup
-# --------------------------------------------------------
 
-dgroups_app_rules = []  # type: list
-follow_mouse_focus = True
-bring_front_click = False
-cursor_warp = False
+
+
+import os
+import subprocess
+# stuff
+@hook.subscribe.startup_once
+def autostart():
+    subprocess.call([os.path.expanduser('.config/qtile/autostart_once.sh')])
+
 auto_fullscreen = True
 focus_on_window_activation = "smart"
 reconfigure_screens = True
@@ -531,6 +442,9 @@ reconfigure_screens = True
 # If things like steam games want to auto-minimize themselves when losing
 # focus, should we respect this or not?
 auto_minimize = True
+
+# When using the Wayland backend, this can be used to configure input devices.
+wl_input_rules = None
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
 # string besides java UI toolkits; you can see several discussions on the
@@ -540,21 +454,8 @@ auto_minimize = True
 #
 # We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
 # java that happens to be on java's whitelist.
-
-# --------------------------------------------------------
-# Windows Manager Name
-# --------------------------------------------------------
-
-wmname = "QTILE"
-
-# --------------------------------------------------------
-# Hooks
-# --------------------------------------------------------
+wmname = "LG3D"
 
 
-# HOOK startup
-@hook.subscribe.startup_once
-def autostart():
-    autostartscript = "~/.config/qtile/autostart.sh"
-    home = os.path.expanduser(autostartscript)
-    subprocess.Popen([home])
+
+# E O F

@@ -1,0 +1,57 @@
+/* ~/.config/waybar/style.css */
+
+* {
+    border: none;
+    border-radius: 0px;
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 13px;
+    min-height: 0;
+    padding: 3px 0px; 
+}
+
+window#waybar {
+    /* background-color: rgba(30, 30, 46, 0.9); */
+    background-color: #1D2021;
+    color: #cdd6f4; 
+    margin: 15px;
+}
+
+#workspaces button {
+    padding: 0 10px;
+    background-color: transparent;
+    color: #a6adc8;
+    border-radius: 8px; 
+}
+
+#workspaces button.active {
+    background-color: #7f849c;
+    color: #1e1e2e;
+    border-radius: 8px; 
+}
+
+#workspaces button:hover {
+    background-color: #45475a; 
+}
+
+#clock, #battery, #cpu, #memory, #network, #pulseaudio, #tray, #bluetooth, #custom-wlogout , #temperature, #workspaces, #window {
+    padding: 0 10px;
+    margin: 0 5px;
+    background-color: #282828; 
+    border-radius: 8px; 
+}
+
+
+#battery.critical {
+    color: #f38ba8;
+}
+
+#custom-wlogout {
+    color: #C7241D; 
+    padding: 5px 12px; 
+    margin: 0 4px;
+    border-radius: 8px;
+}
+
+#custom-wlogout:hover {
+    /* background-color: #A30000;  */
+}
