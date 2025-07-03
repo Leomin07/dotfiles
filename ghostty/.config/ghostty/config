@@ -18,15 +18,15 @@ copy-on-select = clipboard
 
 
 # tab navigation
-keybind = super+b>1=goto_tab:1
-keybind = super+b>2=goto_tab:2
-keybind = super+b>3=goto_tab:3
-keybind = super+b>4=goto_tab:4
-keybind = super+b>5=goto_tab:5
-keybind = super+b>6=goto_tab:6
-keybind = super+b>7=goto_tab:7
-keybind = super+b>8=goto_tab:8
-keybind = super+b>9=goto_tab:9
+keybind = ctrl+1=goto_tab:1
+keybind = ctrl+2=goto_tab:2
+keybind = ctrl+3=goto_tab:3
+keybind = ctrl+4=goto_tab:4
+keybind = ctrl+5=goto_tab:5
+keybind = ctrl+6=goto_tab:6
+keybind = ctrl+7=goto_tab:7
+keybind = ctrl+8=goto_tab:8
+keybind = ctrl+9=goto_tab:9
 
 
 
@@ -48,6 +48,6 @@ focus-follows-mouse = true
 link-url = true
 
 
-window-width = 130
-window-height = 50
+window-width = 135
+window-height = 55
 

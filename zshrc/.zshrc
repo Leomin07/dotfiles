@@ -7,12 +7,13 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions z docke
 source $ZSH/oh-my-zsh.sh
 
 # You may need to manually set your language environment
-export LANG=en_US.UTF-8
+# export LANG=en_US.UTF-8
 
 # Git
 alias gc="git commit -m"
 alias gca="git commit -a -m"
 alias gp="git push origin HEAD"
+alias ggf="git push -f"
 alias gpu="git pull origin"
 alias gst="git status"
 alias glog="git log --graph --topo-order --pretty='%w(100,0,6)%C(yellow)%h%C(bold)%C(black)%d %C(cyan)%ar %C(green)%an%n%C(bold)%C(white)%s %N' --abbrev-commit"
@@ -38,6 +39,8 @@ alias ......="cd ../../../../.."
 export GTK_IM_MODULE=fcitx5
 export QT_IM_MODULE=fcitx5
 export XMODIFIERS="@im=fcitx5"
+export INPUT_METHOD=fcitx
+export SDL_IM_MODULE=fcitx
 
 # Ibus bamboo
 # export GTK_IM_MODULE=ibus
@@ -45,7 +48,7 @@ export XMODIFIERS="@im=fcitx5"
 # export XMODIFIERS="@im=ibus"
 
 # Neovim for linux-mint
-export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+# export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
 # nvm
 export NVM_DIR="$HOME/.nvm"
