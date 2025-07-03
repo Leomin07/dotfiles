@@ -19,18 +19,14 @@ USER_EMAIL="tranminhsvp@gmail.com" # Git global email
 
 SSH_KEY_FILE="$HOME/.ssh/id_ed25519" # Default SSH key file path
 
-# Hyprland configuration directory and file
-HYPR_CONFIG_DIR="$HOME/.config/hypr"
-HYPR_CONFIG_FILE="$HYPR_CONFIG_DIR/hyprland.conf"
-MAIN_MOD="SUPER" # Main modifier key for Hyprland shortcuts
-
 # List of essential packages to install (system, dev, terminal, GUI, fonts, etc.)
 PACKAGES=(
-    # dotnet-sdk-7.0 dotnet-runtime-7.0
     python python-pip tk python-virtualenv ffmpeg vim neovim stow bat fzf tree ripgrep tldr
-    kitty ghostty zoxide lazygit fastfetch visual-studio-code-bin mission-center discord
-    mpv google-chrome brave-bin etcher-bin postman dbeaver
-    telegram-desktop lazydocker ttf-jetbrains-mono-nerd xclip
+    dotnet-sdk-8.0 dotnet-runtime-8.0
+    kitty ghostty zoxide starship lazygit fastfetch visual-studio-code-bin mission-center discord
+    mpv google-chrome brave-bin etcher-bin postman dbeaver mongodb-compass
+    telegram-desktop lazydocker ttf-jetbrains-mono-nerd xclip docker virt-manager virt-viewer gnome-keyring stremio
+    dconf-editor
     # file manager cinnamon nemo
 )
 
@@ -87,25 +83,15 @@ configure_git_and_ssh() {
 # DOCKER INSTALLATION AND ENABLEMENT
 # Install Docker and add current user to docker group
 # --------------------------------------
-install_docker() {
-    log_info "Installing Docker..."
-    local docker_packages=(docker docker-compose)
+config_docker() {
+    # Enable and start docker service
+    sudo systemctl enable docker.service
 
-    # Install packages if not already present
-    for pkg in "${docker_packages[@]}"; do
-        install_package "$pkg"
-    done
-
-    # Enable and start docker service (nên bật)
-    sudo systemctl enable --now docker.service
-
-    # Đảm bảo thêm user thực (không phải root nếu chạy sudo)
+    # Make sure to add the executing user (not root if running sudo)
     local real_user="${SUDO_USER:-$USER}"
     sudo usermod -aG docker "$real_user"
 
     log_success "Docker installed. Please log out or run 'newgrp docker'."
-    # Test Docker with hello-world (dùng sudo vì user mới chưa có quyền ngay)
-    sudo docker run hello-world
 }
 
 # --------------------------------------
@@ -114,86 +100,10 @@ install_docker() {
 # --------------------------------------
 configure_fcitx5() {
     log_info "Configuring fcitx5 (Vietnamese input method)..."
-    local fcitx5_packages=(fcitx5 fcitx5-frontend-gtk3 fcitx5-configtool fcitx5-bamboo)
+    local fcitx5_packages=(fcitx5 fcitx5-im fcitx5-qt fcitx5-gtk fcitx5-bamboo fcitx5-configtool)
     for pkg in "${fcitx5_packages[@]}"; do install_package "$pkg"; done
 
-    local env_vars=(
-        'GTK_IM_MODULE=fcitx5'
-        'QT_IM_MODULE=fcitx5'
-        'XMODIFIERS="@im=fcitx5"'
-    )
-
-    # Helper function to add environment variable if not already present
-    add_env_if_missing() {
-        local file=$1
-        local var_name
-        for env in "${env_vars[@]}"; do
-            var_name="${env%%=*}"
-            if ! grep -qE "^\s*export\s+$var_name=" "$file" 2>/dev/null; then
-                echo "export $env" >>"$file"
-                log_info "Added export $env to $file"
-            else
-                log_info "$var_name already set in $file, skipping..."
-            fi
-        done
-    }
-
-    # Add to ~/.bashrc and source from ~/.bash_profile
-    local BASH_FILE="$HOME/.bashrc"
-    log_info "Checking Bash config: $BASH_FILE"
-    add_env_if_missing "$BASH_FILE"
-    local BASH_PROFILE="$HOME/.bash_profile"
-    grep -q '[[ -f ~/.bashrc ]] && source ~/.bashrc' "$BASH_PROFILE" 2>/dev/null || echo '[[ -f ~/.bashrc ]] && source ~/.bashrc' >>"$BASH_PROFILE"
-
-    # Add to ~/.zshrc and source from ~/.zprofile
-    local ZSH_FILE="$HOME/.zshrc"
-    log_info "Checking Zsh config: $ZSH_FILE"
-    add_env_if_missing "$ZSH_FILE"
-    local ZSH_PROFILE="$HOME/.zprofile"
-    grep -q '[[ -f ~/.zshrc ]] && source ~/.zshrc' "$ZSH_PROFILE" 2>/dev/null || echo '[[ -f ~/.zshrc ]] && source ~/.zshrc' >>"$ZSH_PROFILE"
-
-    log_success "Fcitx5 environment variables configured."
     echo "➡️  Please restart your graphical session or reboot for the changes to take effect."
-}
-
-# --------------------------------------
-# HYPRLAND CONFIGURATION (Wayland, keybindings, Chrome Wayland support)
-# --------------------------------------
-setup_hyprland() {
-    log_info "Setting up Hyprland..."
-
-    # Create keybindings file and set up example keybindings
-    local keybindings="$HOME/.config/hypr/keybindings.conf"
-    mkdir -p "$(dirname "$keybindings")"
-    touch "$keybindings"
-    sed -i 's|bindd = \$mainMod, T.*|bindd = $mainMod, Return, exec, $TERMINAL|' "$keybindings"
-    sed -i 's|bindd = \$mainMod, E.*|bindd = $mainMod, E, exec, nautilus|' "$keybindings"
-    sed -i 's|bindd = \$mainMod, C.*|bindd = $mainMod, C, exec, code|' "$keybindings"
-
-    # Also setup fcitx5 input method
-    configure_fcitx5
-
-    # Ensure fcitx5 starts with Hyprland session
-    mkdir -p "$HYPR_CONFIG_DIR"
-    grep -q "exec-once = fcitx5 -d" "$HYPR_CONFIG_FILE" || echo "exec-once = fcitx5 -d" >>"$HYPR_CONFIG_FILE"
-
-    # Enable Wayland mode for Chrome by editing .desktop file
-    local chrome_desktop="/usr/share/applications/google-chrome.desktop"
-    local chrome_exec='Exec=/usr/bin/google-chrome-stable --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %U'
-    grep -Fq "$chrome_exec" "$chrome_desktop" || echo "$chrome_exec" | sudo tee -a "$chrome_desktop" >/dev/null
-
-    log_success "Hyprland setup completed."
-}
-
-# --------------------------------------
-# BLUETOOTH CONFIGURATION AND ENABLE
-# --------------------------------------
-configure_bluetooth() {
-    log_info "Configuring Bluetooth..."
-    install_package "bluez"
-    install_package "bluez-utils"
-    sudo systemctl enable --now bluetooth.service
-    log_success "Bluetooth configured."
 }
 
 # --------------------------------------
@@ -212,25 +122,20 @@ clone_wallpaper() {
 }
 
 # --------------------------------------
-# REMOVE UNWANTED GNOME DEFAULT APPS
-# --------------------------------------
-remove_gnome_apps() {
-    local apps=(gnome-maps gnome-weather gnome-logs gnome-contacts gnome-connections gnome-clocks gnome-characters gnome-calendar gnome-music)
-    for app in "${apps[@]}"; do
-        sudo pacman -Rns --noconfirm "$app" && log_info "Removed $app"
-    done
-}
-
-# --------------------------------------
 # NODEJS (NVM + YARN) INSTALLATION
 # --------------------------------------
 install_nodejs() {
-    # Download and install nvm
+    # Install NVM (Node Version Manager)
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-    # Source nvm for the current shell
-    \. "$HOME/.nvm/nvm.sh"
-    # Install latest LTS Node.js and Yarn
+
+    # Source NVM to make it available in the current shell session
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+    # Install the latest LTS version of Node.js
     nvm install --lts
+
+    # Install Yarn globally using npm
     npm install --global yarn
 }
 
@@ -252,39 +157,59 @@ ask_yes_no() {
 # CLOUDFLARE WARP VPN INSTALLATION AND REGISTRATION
 # --------------------------------------
 install_warp_client() {
+    log_info "Installing Cloudflare WARP client..."
     install_package "cloudflare-warp-bin"
-    log_info "Registering Cloudflare WARP..."
-    sudo systemctl start warp-svc
-    # warp-cli registration new
-    log_info "Connecting Cloudflare WARP..."
-    # warp-cli connect
-}
 
-# --------------------------------------
-# GNOME KEYRING SETUP FOR GIT/VSCODE CREDENTIALS
-# --------------------------------------
-config_gnome_keyring() {
-    sudo pacman -S --noconfirm gnome-keyring
-    sudo pacman -S --noconfirm libsecret
-    git config --global credential.helper /usr/lib/git-core/git-credential-libsecret
+    log_info "Ensuring Cloudflare WARP service (warp-svc) is running and enabled..."
+    sudo systemctl enable --now warp-svc || {
+        log_error "Failed to enable and start warp-svc. Please check systemd logs."
+        return 1
+    }
+
+    log_info "Attempting to delete any existing Cloudflare WARP registration..."
+    if sudo warp-cli registration delete; then
+        log_success "Old Cloudflare WARP registration deleted."
+    else
+        log_info "No old Cloudflare WARP registration found, proceeding."
+    fi
+
+    log_info "Registering new Cloudflare WARP client..."
+    if sudo warp-cli registration new; then
+        log_success "Cloudflare WARP client registered successfully."
+    else
+        log_error "Failed to register Cloudflare WARP client."
+        return 1
+    fi
+
+    log_info "Connecting Cloudflare WARP..."
+    if sudo warp-cli connect; then
+        log_success "Cloudflare WARP connected successfully."
+    else
+        log_error "Failed to connect Cloudflare WARP."
+        return 1
+    fi
+
+    log_success "Cloudflare WARP setup complete and connected."
+    log_info "You can check its status with: warp-cli status"
 }
 
 # --------------------------------------
 # INSTALL AND CONFIGURE ZSH (Oh My Zsh + plugins)
 # --------------------------------------
-install_zsh() {
-    # Install zsh if not present
+setup_zsh() {
+    # 1. Install Zsh if not present
     if ! command -v zsh &>/dev/null; then
         log_info "Installing Zsh..."
-        sudo pacman -S --noconfirm zsh && log_success "Zsh installed." || {
-            log_error "Failed to install Zsh."
-            return 1
-        }
+        # sudo pacman -S --noconfirm zsh && log_success "Zsh installed." || {
+        #     log_error "Failed to install Zsh."
+        #     return 1
+        # }
+        install_package "zsh"
     else
         log_info "Zsh is already installed, skipping."
     fi
 
-    # Install Oh My Zsh for better Zsh experience
+    # 2. Install Oh My Zsh
     if [ ! -d "$HOME/.oh-my-zsh" ]; then
         log_info "Installing Oh My Zsh..."
         RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
@@ -297,21 +222,20 @@ install_zsh() {
         log_info "Oh My Zsh is already installed, skipping."
     fi
 
-    # Set Zsh as default shell for user
+    # 3. Set Zsh as default shell
     local real_user="${SUDO_USER:-$USER}"
     local current_shell
     current_shell="$(getent passwd "$real_user" | cut -d: -f7)"
     if [ "$current_shell" != "$(which zsh)" ]; then
         log_info "Changing default shell to Zsh for user $real_user..."
         sudo chsh -s "$(which zsh)" "$real_user" &&
-            log_success "Default shell changed to Zsh (log out to apply)." || log_error "Failed to change default shell to Zsh."
+            log_success "Default shell changed to Zsh (log out to apply)." ||
+            log_error "Failed to change default shell to Zsh."
     else
         log_info "Default shell is already Zsh."
     fi
-}
 
-# Install recommended Zsh plugins for productivity and completion
-install_zsh_plugins() {
+    # 4. Install recommended Zsh plugins
     local plugins_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
     declare -A plugins=(
         ["zsh-autosuggestions"]="https://github.com/zsh-users/zsh-autosuggestions"
@@ -327,11 +251,8 @@ install_zsh_plugins() {
             log_info "Zsh plugin '$name' is already installed, skipping."
         fi
     done
-    log_warning "📌 Add the following plugins to your ~/.zshrc: plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions z docker docker-compose)"
-}
 
-# Update ~/.zshrc plugins section with preferred plugins
-config_zsh_plugins() {
+    # 5. Update ~/.zshrc plugins section
     local zshrc="$HOME/.zshrc"
     local desired_plugins="plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions z docker docker-compose)"
     if grep -qE '^plugins=\(.*\)' "$zshrc"; then
@@ -345,170 +266,90 @@ config_zsh_plugins() {
             log_success "Added plugins to ~/.zshrc." ||
             log_error "Failed to add plugins to ~/.zshrc."
     fi
-}
 
-# --------------------------------------
-# INSTALL AND CONFIGURE STARSHIP PROMPT (modern shell prompt)
-# --------------------------------------
-install_starship() {
-    log_info "Installing Starship prompt..."
-    if ! command -v starship &>/dev/null; then
-        log_info "Starship not found. Downloading and installing..."
-        curl -sS https://starship.rs/install.sh | sh -s -- -y &&
-            log_success "Starship installed successfully." || log_error "Failed to install Starship."
+    # 6. Check and copy .zshrc file from dotfiles
+    if [ -f "$HOME/.zshrc" ]; then
+        log_info "Detected old ~/.zshrc, proceeding to delete..."
+        rm "$HOME/.zshrc"
+    fi
+    if [ -f "$HOME/dotfiles/zshrc/.zshrc" ]; then
+        # cp "$HOME/dotfiles/zshrc/.zshrc" "$HOME/"
+        stow "zshrc" --target="$HOME" --dir="$HOME/dotfiles"
+        log_success "Stow ~/dotfiles/zshrc/.zshrc to $HOME/.zshrc"
     else
-        log_info "Starship is already installed. Skipping installation."
+        log_warning "~/dotfiles/zshrc/.zshrc not found, skipping copy step."
     fi
 
-    # Add initialization command to bash and zsh configs if missing
-    add_starship_init() {
-        local shell_rc="$1"
-        local shell_name="$2"
-        local init_cmd="eval \"\$(starship init $shell_name)\""
-        if ! grep -Fxq "$init_cmd" "$shell_rc"; then
-            echo "$init_cmd" >>"$shell_rc"
-            log_info "Added Starship init to $shell_rc"
-        else
-            log_info "Starship init already exists in $shell_rc. Skipping."
-        fi
-    }
-    [ -f ~/.bashrc ] && add_starship_init ~/.bashrc bash
-    [ -f ~/.zshrc ] && add_starship_init ~/.zshrc zsh
-    log_success "Starship setup completed."
-}
-
-# --------------------------------------
-# ZOXIDE (SMART CD) CONFIGURATION
-# --------------------------------------
-config_zoxide() {
-    local bashrc="$HOME/.bashrc"
-    local zshrc="$HOME/.zshrc"
-    local bash_init='eval "$(zoxide init bash)"'
-    local zsh_init='eval "$(zoxide init zsh)"'
-    # Add to Bash config
-    if [ -f "$bashrc" ] && ! grep -Fxq "$bash_init" "$bashrc"; then
-        echo "$bash_init" >>"$bashrc"
-        echo "[✔] Added zoxide init to $bashrc"
-    else
-        echo "[✔] zoxide already configured in $bashrc or file not found"
-    fi
-    # Add to Zsh config
-    if [ -f "$zshrc" ] && ! grep -Fxq "$zsh_init" "$zshrc"; then
-        echo "$zsh_init" >>"$zshrc"
-        echo "[✔] Added zoxide init to $zshrc"
-    else
-        echo "[✔] zoxide already configured in $zshrc or file not found"
-    fi
-}
-
-# --------------------------------------
-# FONTS INSTALLATION
-# --------------------------------------
-install_fonts() {
-    local font_packages=(
-        noto-fonts
-        noto-fonts-emoji
-        ttf-dejavu
-        ttf-roboto
-        ttf-liberation
-        adobe-source-han-sans-otc-fonts
-    )
-    for pkg in "${font_packages[@]}"; do
-        if ! pacman -Q "$pkg" &>/dev/null; then
-            echo "[INFO] Installing font: $pkg"
-            yay -S --noconfirm "$pkg"
-        else
-            echo "[INFO] Font '$pkg' already installed, skipping."
-        fi
-    done
-}
-
-# --------------------------------------
-# GNOME FULL ENVIRONMENT SETUP (Bluetooth, keyring, remove apps, extensions)
-# --------------------------------------
-
-# Function: remove_snap_from_gnome_arch
-# Description: Completely remove snapd and all related integrations from GNOME on Arch Linux
-remove_snap_from_gnome_arch() {
-    echo "==> Removing snapd..."
-    sudo pacman -Rns --noconfirm snapd
-
-    echo "==> Deleting Snap data directories..."
-    sudo rm -rf /var/lib/snapd
-    rm -rf ~/snap
-
-    # Remove GNOME integration package for Snap if installed via AUR
-    if pacman -Qs gnome-software-snap >/dev/null 2>&1; then
-        echo "==> Removing gnome-software-snap..."
-        sudo pacman -Rns --noconfirm gnome-software-snap
-    fi
-
-    echo "==> Cleaning Snap .desktop files from GNOME menu..."
-    rm -rf ~/.local/share/applications/snap-*
-    update-desktop-database ~/.local/share/applications/ || true
-
-    echo "==> Done! Please reboot or log out to apply all changes."
-}
-
-configure_gnome_environment() {
-    # Define an array of GNOME-related apps to install
-    local apps=("extension-manager" "gnome-tweaks")
-
-    log_info "=== Configuring GNOME environment... ==="
-    configure_bluetooth
-    config_gnome_keyring
-    remove_gnome_apps
-    remove_snap_from_gnome_arch
-
-    # Install necessary GNOME apps
-    log_info "Installing GNOME apps: ${apps[*]}"
-    install_package "${apps[@]}"
-
-    if [ -f dump_extensions.txt ]; then
-        log_info "Loading GNOME extension settings from dump_extensions.txt"
-        dconf load /org/gnome/shell/extensions/ <dump_extensions.txt
-    else
-        log_warning "File dump_extensions.txt not found. Skipping GNOME extension load."
-    fi
-    log_success "=== GNOME environment configuration complete! ==="
+    log_warning "📌 Add the following plugins to your ~/.zshrc: plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions z docker docker-compose)"
 }
 
 # --------------------------------------
 # AUTOSTART MAP-KEY TOOL ON LOGIN
 # --------------------------------------
 mapkey() {
-    local desktop_file="$HOME/arch-linux/map-key.desktop"
-    local xmodmap_file="$HOME/arch-linux/.xmodmap"
-    local autostart_dir="$HOME/.config/autostart"
+    local DOTFILES_DIR="$HOME/dotfiles/arch-linux"
+    local XMODMAP_SOURCE="$DOTFILES_DIR/.Xmodmap"
+    local XMODMAP_TARGET="$HOME/.Xmodmap"
+    local XPROFILE="$HOME/.xprofile"
 
-    # Check file existence
-    if [[ ! -f "$desktop_file" ]]; then
-        echo "File $desktop_file không tồn tại!"
-        return 1
-    fi
-    if [[ ! -f "$xmodmap_file" ]]; then
-        echo "File $xmodmap_file không tồn tại!"
+    # Check if source .Xmodmap exists
+    if [ ! -f "$XMODMAP_SOURCE" ]; then
+        echo "❌ File not found: $XMODMAP_SOURCE"
         return 1
     fi
 
-    chmod +x "$desktop_file"
-    chmod +x "$xmodmap_file"
+    # Symlink .Xmodmap to home directory
+    echo "🔗 Linking $XMODMAP_SOURCE to $XMODMAP_TARGET ..."
+    ln -sf "$XMODMAP_SOURCE" "$XMODMAP_TARGET"
 
-    # Apply xmodmap
-    xmodmap "$xmodmap_file"
+    # Ensure ~/.xprofile loads .Xmodmap
+    if ! grep -q 'xmodmap .*\.Xmodmap' "$XPROFILE" 2>/dev/null; then
+        echo "➕ Adding xmodmap load to $XPROFILE"
+        cat <<'EOF' >>"$XPROFILE"
 
-    # Create autostart folder if it doesn't exist
-    mkdir -p "$autostart_dir"
-    cp "$desktop_file" "$autostart_dir/"
+# Load custom Xmodmap on X11 login
+if [ -f "$HOME/.Xmodmap" ]; then
+    xmodmap "$HOME/.Xmodmap"
+fi
+EOF
+    else
+        echo "✅ ~/.xprofile already contains xmodmap load."
+    fi
 
-    echo "Đã setup mapkey autostart thành công!"
+    # Apply immediately
+    echo "⚡ Applying Xmodmap now..."
+    xmodmap "$XMODMAP_TARGET"
+
+    echo "✅ Done. The Insert key is now remapped to Home, and will persist after reboot/login."
+}
+
+config_gnome() {
+    # Remove gnome apps
+    local apps=(gnome-mines quadrapassel gnome-chess gnome-reversi gnome-characters gnome-logs gnome-music gnome-weather gnome-sound-recorder collision gnome-chess gnome-maps gnome-mines iagno gnome-tour gnome-weather gnome-clock gnome-connections gnome-contacts simple-scan yelp lollypop endeavour snapshot micro)
+    for app in "${apps[@]}"; do
+        sudo pacman -Rns --noconfirm "$app" && log_info "Removed $app"
+    done
+
+    # Install gnome-shell-extension-manager
+    for pkg in "extension-manager"; do
+        install_package "$pkg"
+    done
+    # Load gnome extensions
+    dconf load /org/gnome/shell/extensions/ <~/dotfiles/arch-linux/dump_extensions_gnome.txt
+
+    # Enable ghostty default terminal
+    gsettings set org.gnome.desktop.default-applications.terminal exec 'ghostty'
+
+    # Load custom shortcut cinnamon
+    # dconf load /org/gnome/desktop/keybindings/ < ~/dotfiles/arch-linux/cinnamon_custom_keybindings.dconf
+
+    echo "Success"
 }
 
 # --------------------------------------
 # INSTALL VIRTUALIZATION SOFTWARE (QEMU, Virt-Manager, etc.)
 # --------------------------------------
-install_virt_manager() {
-    sudo pacman -S --noconfirm qemu virt-manager virt-viewer dnsmasq vde2 bridge-utils openbsd-netcat ebtables iptables libguestfs
+config_virt_manager() {
     sudo systemctl enable --now libvirtd
     sudo usermod -aG libvirt ${USER}
     sudo systemctl restart libvirtd
@@ -518,6 +359,16 @@ install_virt_manager() {
 install_ibus_bamboo() {
     echo "Installing ibus and ibus-bamboo..."
     local ibus_packages=(ibus ibus-bamboo)
+    local ibus_file="$HOME/dotfiles/arch-linux/ibus.desktop"
+    local autostart_dir="$HOME/.config/autostart"
+
+    # Check file existence
+    if [[ ! -f "$ibus_file" ]]; then
+        echo "The file $desktop_file does not exist!"
+        return 1
+    fi
+
+    cp "$ibus_file" "$autostart_dir"
 
     # Install packages if not already present
     for pkg in "${ibus_packages[@]}"; do
@@ -551,15 +402,121 @@ install_ibus_bamboo() {
     local BASH_PROFILE="$HOME/.bash_profile"
     grep -q '[[ -f ~/.bashrc ]] && source ~/.bashrc' "$BASH_PROFILE" 2>/dev/null || echo '[[ -f ~/.bashrc ]] && source ~/.bashrc' >>"$BASH_PROFILE"
 
-    # Add to ~/.zshrc and source from ~/.zprofile
-    local ZSH_FILE="$HOME/.zshrc"
-    log_info "Checking Zsh config: $ZSH_FILE"
-    add_env_if_missing "$ZSH_FILE"
-    local ZSH_PROFILE="$HOME/.zprofile"
-    grep -q '[[ -f ~/.zshrc ]] && source ~/.zshrc' "$ZSH_PROFILE" 2>/dev/null || echo '[[ -f ~/.zshrc ]] && source ~/.zshrc' >>"$ZSH_PROFILE"
+    # # Add to ~/.zshrc and source from ~/.zprofile
+    # local ZSH_FILE="$HOME/.zshrc"
+    # log_info "Checking Zsh config: $ZSH_FILE"
+    # add_env_if_missing "$ZSH_FILE"
+    # local ZSH_PROFILE="$HOME/.zprofile"
+    # grep -q '[[ -f ~/.zshrc ]] && source ~/.zshrc' "$ZSH_PROFILE" 2>/dev/null || echo '[[ -f ~/.zshrc ]] && source ~/.zshrc' >>"$ZSH_PROFILE"
 
     echo "Installation and configuration complete!"
     echo "Please log out and log in again, then add 'Bamboo' in IBus Preferences if needed."
+}
+
+# Gnu stow config
+stow_configs() {
+    local folders=("ghostty" "kitty" "nvim")
+    local config_dir="$HOME/.config"
+    local dotfiles_dir="$HOME/dotfiles"
+
+    # Ensure the dotfiles_dir exists
+    if [ ! -d "$dotfiles_dir" ]; then
+        log_error "Dotfiles directory '$dotfiles_dir' does not exist. Please create it first."
+        return 1
+    fi
+
+    # Change into the dotfiles_dir so 'stow' can operate correctly
+    # Use a subshell () to avoid changing the current directory of the calling shell
+    (
+        cd "$dotfiles_dir" || {
+            log_error "Could not access directory $dotfiles_dir"
+            return 1
+        }
+
+        local normalized_dotfiles_root
+        normalized_dotfiles_root="$(readlink -f "$dotfiles_dir")"
+        normalized_dotfiles_root="${normalized_dotfiles_root%/}" # Remove trailing slash if any
+
+        for folder in "${folders[@]}"; do
+            log_info "Processing package '$folder'..."
+
+            # Full path to the package source directory within dotfiles (e.g., /home/minhtd/dotfiles/nvim)
+            local package_source_dir="${normalized_dotfiles_root}/${folder}"
+
+            # Check if the package source directory actually exists
+            if [ ! -d "$package_source_dir" ]; then
+                log_error "  Source package directory '$package_source_dir' does not exist. Skipping this package."
+                continue
+            fi
+
+            # The path where the symlink is expected to appear (e.g., ~/.config/nvim)
+            local target="$config_dir/$folder"
+
+            # --- CALCULATE PRECISE expected_symlink_target ---
+            # This is crucial to match your specific dotfile structure (e.g., dotfiles/package/.config/package)
+            local expected_symlink_target=""
+
+            # => relative_target_from_config = nvim
+            local relative_target_from_config="${target#$config_dir/}"
+
+            expected_symlink_target="${package_source_dir}/.config/${relative_target_from_config}"
+            expected_symlink_target="${expected_symlink_target%/}" # Canonicalize: remove trailing slash if any
+
+            # --- 1. If the target does NOT exist ---
+            if [ ! -e "$target" ]; then
+                log_info "  '$target' does not exist. Proceeding to stow '$folder'."
+                stow "$folder" --target="$HOME" --dir="$dotfiles_dir"
+                if [ $? -eq 0 ]; then
+                    log_success "  Successfully stowed '$folder' into '$config_dir'."
+                else
+                    log_error "  Stow of '$folder' failed."
+                fi
+                continue # Move to the next package
+            fi
+
+            # --- 2. If the target IS a symlink AND points to the CORRECT source ---
+            if [ -L "$target" ]; then # Check if it's a symbolic link
+                local actual_link
+                actual_link="$(readlink -f "$target")" # Get the absolute path the symlink points to
+                actual_link="${actual_link%/}"         # Canonicalize: remove trailing slash if any
+
+                if [ "$actual_link" = "$expected_symlink_target" ]; then
+                    log_info "  '$target' is already correctly symlinked to '$expected_symlink_target'. Skipping."
+                    continue # Move to the next package
+                else
+                    log_info "  '$target' is an incorrect symlink (points to '$actual_link' instead of '$expected_symlink_target')."
+                fi
+            else
+                # If -e is true but -L is false, it's a regular directory or file
+                log_info "  '$target' exists but is not a symlink. Will move to .bak."
+            fi
+
+            # --- 3. If the target exists but is NOT a correct symlink (or is a wrong symlink) ---
+            # (Execution reaches here if the above conditions were not met)
+            local bak_name="${target}.bak"
+            local i=1
+            while [ -e "$bak_name" ]; do # Find a unique backup name
+                bak_name="${target}.bak$i"
+                ((i++))
+            done
+
+            log_info "  Moving '$target' to '$bak_name' to make way for new symlink."
+            mv "$target" "$bak_name"
+            if [ $? -ne 0 ]; then
+                log_error "  Could not rename '$target' to '$bak_name'. Skipping stow for this package."
+                continue
+            fi
+
+            # Finally, perform the stow operation
+            log_info "  Proceeding to stow '$folder'."
+            stow "$folder" --target="$HOME" --dir="$dotfiles_dir"
+            if [ $? -eq 0 ]; then
+                log_success "  Successfully stowed '$folder' into '$config_dir'."
+            else
+                log_error "  Stow of '$folder' failed."
+            fi
+        done
+    )
 }
 
 # --------------------------------------
@@ -582,9 +539,7 @@ sudo pacman -Syu --noconfirm
 for pkg in "${PACKAGES[@]}"; do install_package "$pkg"; done
 
 # Install and configure Zsh & plugins
-install_zsh
-install_zsh_plugins
-config_zsh_plugins
+setup_zsh
 
 # Install NodeJS (nvm, yarn)
 install_nodejs
@@ -592,27 +547,19 @@ install_nodejs
 # Configure Git and SSH key
 configure_git_and_ssh
 
-# Install and enable Docker
-install_docker
+# Config Docker
+config_docker
 
-# Install and configure Starship prompt
-install_starship
+# Stow config
+stow_configs
 
 # Optional setups with yes/no prompt for user customization
-if ask_yes_no "Configure map-key?"; then mapkey; fi
-if ask_yes_no "Configure config_zoxide?"; then config_zoxide; fi
+if ask_yes_no "Configure mapkey(X11)?"; then mapkey; fi
+# if ask_yes_no "Configure gnome?"; then config_gnome; fi
 if ask_yes_no "Install ibus-bamboo?"; then install_ibus_bamboo; fi
 if ask_yes_no "Configure fcitx5 environment?"; then configure_fcitx5; fi
 if ask_yes_no "Clone wallpaper repository?"; then clone_wallpaper; fi
-# if ask_yes_no "Configure full GNOME environment (Bluetooth, keyring, remove apps, GNOME extensions)?"; then
-#     configure_gnome_environment
-# fi
-# if ask_yes_no "Load GNOME extension settings from file?"; then
-#     dconf load /org/gnome/shell/extensions/ <dump_extensions.txt
-# fi
-# if ask_yes_no "Configure Hyprland and fcitx5?"; then setup_hyprland; fi
-if ask_yes_no "Install recommended fonts?"; then install_fonts; fi
 if ask_yes_no "Install warp client?"; then install_warp_client; fi
-if ask_yes_no "Install virt_manager?"; then install_virt_manager; fi
+if ask_yes_no "Install virt_manager?"; then config_virt_manager; fi
 
 log_success "Arch Linux setup script completed!"
