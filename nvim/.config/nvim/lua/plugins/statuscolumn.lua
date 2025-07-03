@@ -44,19 +44,12 @@ return {
 						},
 						colwidth = 2,
 					},
-					-- {
-					-- 	text = {
-					-- 		function(args)
-					-- 			args.fold.close = " "
-					-- 			args.fold.open = " "
-					-- 			args.fold.sep = "▕ "
-					-- 			return builtin.foldfunc(args)
-					-- 		end,
-					-- 	},
-					-- 	click = "v:lua.ScFa",
-					-- },
 				},
 			})
+
+			vim.api.nvim_set_hl(0, "CursorLine", { bg = "#2D3436", blend = 0 })
+			vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#A6E22E", bg = "#2D3436" })
+			vim.api.nvim_set_hl(0, "StatusColumn", { bg = "#25282A" }) 
 		end,
 	},
 }

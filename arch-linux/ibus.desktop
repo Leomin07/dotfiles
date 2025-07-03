@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=ibus-daemon -drx
+X-GNOME-Autostart-enabled=true
+NoDisplay=false
+Hidden=false
+Name[en_US]=map-key.desktop
+Comment[en_US]=No description
+X-GNOME-Autostart-Delay=0
+
