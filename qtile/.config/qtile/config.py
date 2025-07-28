@@ -161,7 +161,7 @@ def search():
 
 
 def power():
-    qtile.cmd_spawn("sh -c ~/.config/rofi/scripts/power")
+    qtile.cmd_spawn("sh -c ~/.config/qtile/scripts/power")
 
 
 # ---------------------------------------------------------------------------- #
@@ -186,6 +186,13 @@ padding = 6
 
 bar_widgets = [
     # === LEFT ===
+    widget.TextBox(
+        text="",
+        font=font,
+        fontsize=fontsize + 2,
+        foreground=colors["blue"],
+        mouse_callbacks={"Button1": lazy.spawn("sh -c ~/.config/qtile/scripts/wallpaper.sh")},
+    ),
     widget.GroupBox(
         font=font,
         fontsize=fontsize,
@@ -212,23 +219,36 @@ bar_widgets = [
     # === CENTER ===
     widget.Spacer(),  # Centering left
     widget.TextBox("", foreground=colors["pink"], font=font),
-    widget.Clock(format="%a, %b %d %H:%M", foreground=colors["pink"], font=font),
+    widget.Clock(format="%a, %b %d/%m/%Y %H:%M", foreground=colors["pink"], font=font),
     widget.Spacer(),  # Centering right
     # === RIGHT ===
     widget.TextBox("", foreground=colors["red"], font=font),
-    widget.CPU(format="{load_percent}%", foreground=colors["red"], font=font),
+    widget.CPU(
+        format="{load_percent}%",
+        foreground=colors["red"],
+        font=font,
+        update_interval=5,
+    ),
     widget.TextBox("", foreground=colors["orange"], font=font),
     widget.ThermalSensor(
-        tag_sensor="Package id 0",
+        # tag_sensor="Package id 0",
         format="{temp}°C",
         foreground=colors["orange"],
         font=font,
         padding=padding,
+        update_interval=5,
     ),
     widget.TextBox("", foreground=colors["yellow"], font=font),
-    widget.Memory(format="{MemUsed:.0f} GiB", foreground=colors["yellow"], font=font),
+    widget.Memory(
+        format="{MemUsed:.0f} GiB",
+        foreground=colors["yellow"],
+        font=font,
+        update_interval=5,
+    ),
     widget.TextBox("", foreground=colors["yellow"], font=font),
     widget.Volume(
+        font=font,
+        foreground=colors["yellow"],
         mute_command="pamixer --toggle-mute",
         volume_up_command="pamixer -i 5",
         volume_down_command="pamixer -d 5",
@@ -251,7 +271,9 @@ bar_widgets = [
         "",
         foreground=colors["red"],
         font=font,
-        mouse_callbacks={"Button1": lazy.shutdown()},
+        mouse_callbacks={
+            "Button1": lambda: qtile.cmd_spawn("sh -c '~/.config/qtile/scripts/power'")
+        },
     ),
 ]
 
@@ -261,7 +283,10 @@ screens = [
             bar_widgets,
             size=30,
             background=colors["bg"],
-            margin=[6, 10, 0, 10],
+            # padding=20,
+            opacity=0.7,
+            border_width=[0, 0, 0, 0],
+            margin=[0, 0, 0, 0],
         )
     )
 ]
