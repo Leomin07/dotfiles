@@ -229,11 +229,8 @@ bar_widgets = [
     widget.Memory(format="{MemUsed:.0f} GiB", foreground=colors["yellow"], font=font),
     widget.TextBox("", foreground=colors["yellow"], font=font),
     widget.Volume(
-        emoji=True,
-        emoji_list=["🔇", "🔈", "🔉", "🔊"],
-        fontsize=16,
+        font=font,
         foreground=colors["yellow"],
-        background=colors["dark"],
         mute_command="pamixer --toggle-mute",
         volume_up_command="pamixer -i 5",
         volume_down_command="pamixer -d 5",
