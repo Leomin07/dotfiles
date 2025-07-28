@@ -29,7 +29,7 @@ PACKAGES=(
     ttf-jetbrains-mono-nerd noto-fonts noto-fonts noto-fonts-emoji ttf-dejavu ttf-roboto ttf-liberation adobe-source-han-sans-otc-fonts
 
     # --- Cursors, Themes, Look & Feel ---
-    bibata-cursor-theme adw-gtk-theme nwg-displays nwg-look
+    bibata-cursor-theme adw-gtk-theme
 
     # --- File Managers & Utilities ---
     nemo nemo-fileroller yazi
@@ -41,7 +41,7 @@ PACKAGES=(
     pavucontrol-qt libdbusmenu-gtk3 playerctl pavucontrol-git
 
     # qtile
-    rofi picom pywal python-psutil python-pybluez pamixer
+    rofi picom pywal python-psutil python-pybluez pamixer dunst xidlehook xsecurelock nitrogen xorg-xrandr i3lock-color betterlockscreen
 )
 
 # --------------------------------------
@@ -456,7 +456,7 @@ config_qtile() {
 
 }
 
-# Set ap default hyprland
+# Set ap default qtile
 set_my_default_apps() {
     echo "Setting default applications..."
 
@@ -607,7 +607,7 @@ config_docker
 stow_configs
 
 # Optional setups with yes/no prompt for user customization
-if ask_yes_no "Config hyprland?"; then config_qtile; fi
+if ask_yes_no "Config qtile?"; then config_qtile; fi
 if ask_yes_no "Remap keyd?"; then setup_keyd_remap; fi
 if ask_yes_no "Configure app default qtile?"; then set_my_default_apps; fi
 if ask_yes_no "Clone wallpaper repository?"; then clone_wallpaper; fi

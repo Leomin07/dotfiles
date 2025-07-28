@@ -55,10 +55,12 @@ keys = [
     Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
     Key([mod, "shift"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
-    # Key([mod], "r", lazy.spawn("sh -c ~/.config/rofi/scripts/launcher"), desc="Spawn a command using a prompt widget"),
-    # Key([mod], "p", lazy.spawn("sh -c ~/.config/rofi/scripts/power"), desc='powermenu'),
-    # Key([mod], "t", lazy.spawn("sh -c ~/.config/rofi/scripts/theme_switcher"), desc='theme_switcher'),
-    # C U S T O M
+    Key(
+        [mod],
+        "l",
+        lazy.spawn("betterlockscreen -l dimblur -- --clock"),
+        desc="Lock screen",
+    ),
     Key(
         [],
         "XF86AudioRaiseVolume",
@@ -80,22 +82,19 @@ keys = [
     Key(
         [],
         "XF86MonBrightnessUp",
-        lazy.spawn("brightnessctl s 10%+"),
+        lazy.spawn("brightnessctl s 5%+"),
         desc="brightness UP",
     ),
     Key(
         [],
         "XF86MonBrightnessDown",
-        lazy.spawn("brightnessctl s 10%-"),
+        lazy.spawn("brightnessctl s 5%-"),
         desc="brightness Down",
     ),
     Key([mod], "e", lazy.spawn("nemo"), desc="file manager"),
     Key([mod], "b", lazy.spawn("thorium-browser"), desc="thorium"),
     Key([mod], "c", lazy.spawn("code"), desc="vscode"),
     Key([mod], "d", lazy.spawn("rofi -show drun"), desc="rofi"),
-    Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -q sset Master 5%+")),
-    Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -q sset Master 5%-")),
-    Key([], "XF86AudioMute", lazy.spawn("amixer -q sset Master toggle")),
 ]
 
 
@@ -191,7 +190,9 @@ bar_widgets = [
         font=font,
         fontsize=fontsize + 2,
         foreground=colors["blue"],
-        mouse_callbacks={"Button1": lazy.spawn("sh -c ~/.config/qtile/scripts/wallpaper.sh")},
+        mouse_callbacks={
+            "Button1": lazy.spawn("sh -c ~/.config/qtile/scripts/wallpaper.sh")
+        },
     ),
     widget.GroupBox(
         font=font,

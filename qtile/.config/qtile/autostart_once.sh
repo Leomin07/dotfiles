@@ -16,4 +16,22 @@ dunst &
 
 
 # Setup Wallpaper and update colors
-# ~/.config/qtile/scripts/wallpaper.sh init
+nitrogen --restore &
+
+
+
+# Tự động khóa màn hình sau 5 phút không hoạt động
+xidlehook \
+  --not-when-audio \
+  --not-when-fullscreen \
+  --timer 1200 \
+    'betterlockscreen -l dimblur -- --clock' \
+    '' &
+
+# monitor
+xrandr --output DP-1 \
+       --mode 2560x1440 \
+       --rate 180 \
+       --pos 0x0 \
+       --scale 1x1 \
+       --depth 10

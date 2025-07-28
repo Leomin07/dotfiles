@@ -35,26 +35,39 @@ run_rofi() {
 # ───────────────────────────────────────────────────────────────
 #                        Run Commands
 # ───────────────────────────────────────────────────────────────
-
 run_cmd() {
     case "$1" in
-        "$shutdown") systemctl poweroff ;;
-        "$reboot") systemctl reboot ;;
-        "$suspend")
+        shutdown)
+            systemctl poweroff
+            ;;
+        reboot)
+            systemctl reboot
+            ;;
+        suspend)
             mpc -q pause 2>/dev/null
             amixer set Master mute
             systemctl suspend
             ;;
-        "$logout") pkill -KILL -u "$USER" ;;
-        "$lock")
-            if command -v betterlockscreen &>/dev/null; then
+        logout)
+            pkill -KILL -u "$USER"
+            ;;
+        lock)
+            if command -v cinnamon-screensaver-command &>/dev/null; then
+                cinnamon-screensaver-command -l
+            elif command -v betterlockscreen &>/dev/null; then
                 betterlockscreen -l
             elif command -v i3lock &>/dev/null; then
                 i3lock
+            else
+                echo "No lock command found!" >&2
             fi
+            ;;
+        *)
+            echo "Usage: run_cmd {shutdown|reboot|suspend|logout|lock}"
             ;;
     esac
 }
+
 
 # ───────────────────────────────────────────────────────────────
 #                          Main Menu

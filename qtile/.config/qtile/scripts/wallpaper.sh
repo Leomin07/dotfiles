@@ -4,7 +4,7 @@
 wallDIR="$HOME/Pictures/wallpaper"
 
 # File cache lưu lại hình nền hiện tại
-CACHE="$HOME/.cache/wal/current_wallpaper"
+CACHE="$HOME/.cache/wallpaper_current"
 
 # Command rofi chọn hình nền
 rofi_command="rofi -dmenu -i -config ~/.config/rofi/wallpaper-select.rasi"
@@ -12,7 +12,7 @@ rofi_command="rofi -dmenu -i -config ~/.config/rofi/wallpaper-select.rasi"
 # Lấy danh sách ảnh nền (tên + icon preview)
 mapfile -t PICS < <(find "$wallDIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) | sort)
 
-# Menu Rofi với preview icon
+# Hiển thị menu Rofi có icon preview
 menu() {
     for pic in "${PICS[@]}"; do
         name=$(basename "$pic")
@@ -20,11 +20,11 @@ menu() {
     done
 }
 
-# Hiển thị menu và chọn
+# Lựa chọn từ rofi
 choice=$(menu | $rofi_command)
 
 # Nếu không chọn gì thì thoát
-[ -z "$choice" ] && echo "No choice" && exit 0
+[ -z "$choice" ] && echo "No choice selected" && exit 0
 
 # Tìm đúng path ảnh được chọn
 for img in "${PICS[@]}"; do
@@ -34,19 +34,16 @@ for img in "${PICS[@]}"; do
     fi
 done
 
-# Nếu không tìm thấy thì báo lỗi
+# Nếu không tìm thấy thì thoát
 [ -z "$selected" ] && echo "Image not found" && exit 1
 
 # Lưu ảnh đã chọn
 echo "$selected" > "$CACHE"
 
-# Áp dụng wal
-wal -q -i "$selected"
+# Đặt ảnh nền bằng nitrogen
+nitrogen --set-zoom-fill "$selected" --save
 
-# Reload lại Qtile (áp theme mới)
-qtile cmd-obj -o cmd -f reload_config
-
-# Notify
+# Gửi thông báo
 notify-send "Wallpaper Set" "$choice"
 
 exit 0
