@@ -216,10 +216,10 @@ bar_widgets = [
         max_chars=50,
     ),
     # === CENTER ===
-    widget.Spacer(),
+    widget.Spacer(),  # Centering left
     widget.TextBox("", foreground=colors["pink"], font=font),
     widget.Clock(format="%a, %b %d %H:%M", foreground=colors["pink"], font=font),
-    widget.Spacer(),
+    widget.Spacer(),  # Centering right
     # === RIGHT ===
     widget.TextBox("", foreground=colors["red"], font=font),
     widget.CPU(format="{load_percent}%", foreground=colors["red"], font=font),
@@ -233,6 +233,7 @@ bar_widgets = [
     ),
     widget.TextBox("", foreground=colors["yellow"], font=font),
     widget.Memory(format="{MemUsed:.0f} GiB", foreground=colors["yellow"], font=font),
+    widget.TextBox("", foreground=colors["yellow"], font=font),
     widget.Volume(
         emoji=True,
         emoji_list=["", "", ""],
@@ -243,11 +244,14 @@ bar_widgets = [
         update_interval=0.2,
     ),
     # widget.TextBox("󰈀", foreground=colors["pink"], font=font),
-    # widget.Net(
-    #     interface="enp3s0", format="Wired", foreground=colors["pink"], font=font
-    # ),
+    # widget.Net(interface="enp3s0", format="Wired", foreground=colors["pink"], font=font),
     widget.TextBox("", foreground=colors["blue"], font=font),
-    widget.Bluetooth(fmt="{}", foreground=colors["blue"], font=font),
+    widget.Bluetooth(
+        fmt="{}",
+        foreground=colors["blue"],
+        font=font,
+        mouse_callbacks={"Button1": lazy.spawn("blueman-manager")},
+    ),
     widget.TextBox("", foreground=colors["fg"], font=font),
     widget.TextBox(
         "",
