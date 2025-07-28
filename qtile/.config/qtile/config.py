@@ -125,37 +125,28 @@ for i in groups:
     )
 
 
-# L A Y O U T S
-
-
-lay_config = {
-    "border_width": 0,
-    "margin": 9,
-    "border_focus": "3b4252",
-    "border_normal": "3b4252",
-    "font": "FiraCode Nerd Font",
-    "grow_amount": 2,
-}
+# ---------------------------------------------------------------------------- #
+#                                    Layouts                                   #
+# ---------------------------------------------------------------------------- #
 
 layout_theme = {
     "border_width": 3,
-    "margin": 15,
+    "margin": 12,
     "border_focus": "#d4be98",
     "border_normal": "#24273A",
     "single_border_width": 3,
 }
 
-# ---------------------------------------------------------------------------- #
-#                                    Layouts                                   #
-# ---------------------------------------------------------------------------- #
-
 layouts = [
-    layout.Max(**layout_theme),
+    # Tiling Layouts
     layout.MonadTall(**layout_theme),
     layout.MonadWide(**layout_theme),
     layout.RatioTile(**layout_theme),
+    # Fullscreen Layout
+    layout.Max(**layout_theme),
     layout.Floating(),
 ]
+
 
 widget_defaults = dict(
     font="sans",
