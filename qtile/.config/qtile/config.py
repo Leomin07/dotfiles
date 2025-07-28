@@ -191,7 +191,7 @@ bar_widgets = [
         font=font,
         fontsize=fontsize + 2,
         foreground=colors["blue"],
-        mouse_callbacks={"Button1": lazy.spawn("sh ~/.config/qtile/wallpaper.sh")},
+        mouse_callbacks={"Button1": lazy.spawn("sh -c ~/.config/qtile/scripts/wallpaper.sh")},
     ),
     widget.GroupBox(
         font=font,
@@ -272,7 +272,7 @@ bar_widgets = [
         foreground=colors["red"],
         font=font,
         mouse_callbacks={
-            "Button1": lambda: qtile.cmd_spawn("sh -c '~/.config/rofi/scripts/power'")
+            "Button1": lambda: qtile.cmd_spawn("sh -c '~/.config/qtile/scripts/power'")
         },
     ),
 ]
@@ -283,7 +283,7 @@ screens = [
             bar_widgets,
             size=30,
             background=colors["bg"],
-            padding=20,
+            # padding=20,
             opacity=0.7,
             border_width=[0, 0, 0, 0],
             margin=[0, 0, 0, 0],
