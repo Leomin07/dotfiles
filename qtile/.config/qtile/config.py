@@ -149,7 +149,7 @@ dgroups_key_binder = simple_key_binder(mod)
 groups.append(ScratchPad("6", [
     DropDown("chatgpt", lazy.spawn("bash " + home + "/.config/ml4w/settings/ai.sh"), x=0.3, y=0.1, width=0.40, height=0.4, on_focus_lost_hide=False ),
     DropDown("mousepad", "mousepad", x=0.3, y=0.1, width=0.40, height=0.4, on_focus_lost_hide=False ),
-    DropDown("terminal", "kitty", x=0.3, y=0.1, width=0.40, height=0.4, on_focus_lost_hide=False ),
+    DropDown("terminal", "ghostty", x=0.3, y=0.1, width=0.40, height=0.4, on_focus_lost_hide=False ),
     DropDown("scrcpy", "scrcpy -d", x=0.8, y=0.05, width=0.15, height=0.6, on_focus_lost_hide=False )
 ]))
 
@@ -362,11 +362,11 @@ widget_list = [
 ]
 
 # Hide Modules if not on laptop
-if (show_wlan == False):
-    del widget_list[13:14]
+if not show_bluetooth:
+    widget_list = [w for w in widget_list if not isinstance(w, widget.Bluetooth)]
+if not show_wlan:
+    widget_list = [w for w in widget_list if not isinstance(w, widget.Wlan)]
 
-if (show_bluetooth == False):
-    del widget_list[12:13]
 
 # --------------------------------------------------------
 # Screens
