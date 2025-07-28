@@ -41,7 +41,7 @@ PACKAGES=(
     pavucontrol-qt libdbusmenu-gtk3 playerctl pavucontrol-git
 
     # qtile
-    rofi picom pywal python-psutil
+    rofi picom pywal python-psutil python-pybluez
 )
 
 # --------------------------------------
