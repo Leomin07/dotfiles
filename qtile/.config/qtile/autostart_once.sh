@@ -16,4 +16,4 @@ dunst &
 
 
 # Setup Wallpaper and update colors
-~/.config/qtile/scripts/wallpaper.sh init
+# ~/.config/qtile/scripts/wallpaper.sh init
