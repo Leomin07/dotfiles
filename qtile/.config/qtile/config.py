@@ -1,15 +1,3 @@
-#       █████████     ███████    ███████████ █████ █████ ███████████ █████ █████       ██████████
-#      ███░░░░░███  ███░░░░░███ ░█░░░░░░███ ░░███ ░░███ ░█░░░███░░░█░░███ ░░███       ░░███░░░░░█
-#     ███     ░░░  ███     ░░███░     ███░   ░░███ ███  ░   ░███  ░  ░███  ░███        ░███  █ ░
-#    ░███         ░███      ░███     ███      ░░█████       ░███     ░███  ░███        ░██████
-#    ░███         ░███      ░███    ███        ░░███        ░███     ░███  ░███        ░███░░█
-#    ░░███     ███░░███     ███   ████     █    ░███        ░███     ░███  ░███      █ ░███ ░   █
-#     ░░█████████  ░░░███████░   ███████████    █████       █████    █████ ███████████ ██████████
-#      ░░░░░░░░░     ░░░░░░░    ░░░░░░░░░░░    ░░░░░       ░░░░░    ░░░░░ ░░░░░░░░░░░ ░░░░░░░░░░
-#
-#                                                                                    - DARKKAL44
-
-
 from libqtile import bar, layout, widget, hook, qtile
 from libqtile.config import Click, Drag, Group, Key, Match, hook, Screen, KeyChord
 from libqtile.lazy import lazy
@@ -18,8 +6,9 @@ from libqtile.lazy import lazy
 mod = "mod4"
 terminal = "ghostty"
 
-# █▄▀ █▀▀ █▄█ █▄▄ █ █▄░█ █▀▄ █▀
-# █░█ ██▄ ░█░ █▄█ █ █░▀█y █▄▀ ▄█
+# ---------------------------------------------------------------------------- #
+#                                    Keybind                                   #
+# ---------------------------------------------------------------------------- #
 
 
 keys = [
@@ -107,8 +96,9 @@ keys = [
 ]
 
 
-# █▀▀ █▀█ █▀█ █░█ █▀█ █▀
-# █▄█ █▀▄ █▄█ █▄█ █▀▀ ▄█
+# ---------------------------------------------------------------------------- #
+#                                    Groups                                    #
+# ---------------------------------------------------------------------------- #
 
 
 groups = [Group(f"{i+1}", label="") for i in range(8)]
@@ -144,28 +134,25 @@ lay_config = {
     "grow_amount": 2,
 }
 
-layouts = [
-    # layout.MonadWide(**lay_config),
-    layout.Bsp(**lay_config, fair=False, border_on_single=True),
-    layout.Columns(
-        **lay_config,
-        border_on_single=True,
-        num_columns=2,
-        split=False,
-    ),
-    # Plasma(lay_config, border_normal_fixed='#3b4252', border_focus_fixed='#3b4252', border_width_single=3),
-    # layout.RatioTile(**lay_config),
-    # layout.VerticalTile(**lay_config),
-    # layout.Matrix(**lay_config, columns=3),
-    # layout.Zoomy(**lay_config),
-    # layout.Slice(**lay_config, width=1920, fallback=layout.TreeTab(), match=Match(wm_class="joplin"), side="right"),
-    # layout.MonadTall(**lay_config),
-    # layout.Tile(shift_windows=True, **lay_config),
-    # layout.Stack(num_stacks=2, **lay_config),
-    layout.Floating(**lay_config),
-    layout.Max(**lay_config),
-]
+layout_theme = {
+    "border_width": 3,
+    "margin": 15,
+    "border_focus": "#E75B5B",
+    "border_normal": "FFFFFF",
+    "single_border_width": 3,
+}
 
+# ---------------------------------------------------------------------------- #
+#                                    Layouts                                   #
+# ---------------------------------------------------------------------------- #
+
+layouts = [
+    layout.Max(**layout_theme),
+    layout.MonadTall(**layout_theme),
+    layout.MonadWide(**layout_theme),
+    layout.RatioTile(**layout_theme),
+    layout.Floating(),
+]
 
 widget_defaults = dict(
     font="sans",
@@ -183,46 +170,95 @@ def power():
     qtile.cmd_spawn("sh -c ~/.config/rofi/scripts/power")
 
 
-# █▄▄ ▄▀█ █▀█
-# █▄█ █▀█ █▀▄
+# ---------------------------------------------------------------------------- #
+#                                      Bar                                     #
+# ---------------------------------------------------------------------------- #
 
+# Gruvbox Dark theme
+colors = {
+    "bg": "#1e1e2e",
+    "fg": "#cdd6f4",
+    "red": "#f38ba8",
+    "orange": "#fab387",
+    "yellow": "#f9e2af",
+    "green": "#a6e3a1",
+    "blue": "#89b4fa",
+    "pink": "#f5c2e7",
+    "gray": "#313244",
+}
+
+font = "JetBrainsMono Nerd Font"
+fontsize = 14
+padding = 6
+
+bar_widgets = [
+    # === LEFT ===
+    widget.GroupBox(
+        font=font,
+        fontsize=fontsize,
+        margin_y=3,
+        margin_x=3,
+        padding_y=6,
+        padding_x=6,
+        borderwidth=2,
+        active=colors["yellow"],
+        inactive=colors["gray"],
+        rounded=True,
+        highlight_method="block",
+        highlight_color=[colors["gray"], colors["gray"]],
+        this_current_screen_border=colors["orange"],
+        urgent_border=colors["red"],
+        disable_drag=True,
+    ),
+    widget.Sep(linewidth=0, padding=5),
+    widget.WindowName(
+        font=font,
+        foreground=colors["pink"],
+        max_chars=50,
+    ),
+    # === CENTER ===
+    widget.Spacer(),
+    widget.TextBox("", foreground=colors["pink"], font=font),
+    widget.Clock(format="%a, %b %d %H:%M", foreground=colors["pink"], font=font),
+    widget.Spacer(),
+    # === RIGHT ===
+    widget.CurrentLayout(foreground=colors["fg"], font=font, padding=padding),
+    widget.TextBox("", foreground=colors["red"], font=font),
+    widget.CPU(format="{load_percent}%", foreground=colors["red"], font=font),
+    widget.TextBox("󰈁", foreground=colors["orange"], font=font),
+    widget.ThermalSensor(
+        tag_sensor="Package id 0",
+        format="{temp}°C",
+        foreground=colors["orange"],
+        font=font,
+        padding=padding,
+    ),
+    widget.TextBox("", foreground=colors["yellow"], font=font),
+    widget.Memory(format="{MemUsed:.0f} GiB", foreground=colors["yellow"], font=font),
+    widget.TextBox("󰈀", foreground=colors["pink"], font=font),
+    widget.Net(
+        interface="enp3s0", format="Wired", foreground=colors["pink"], font=font
+    ),
+    widget.TextBox("", foreground=colors["blue"], font=font),
+    widget.Bluetooth(fmt="{}", foreground=colors["blue"], font=font),
+    widget.TextBox("", foreground=colors["fg"], font=font),
+    widget.TextBox(
+        "",
+        foreground=colors["red"],
+        font=font,
+        mouse_callbacks={"Button1": lazy.shutdown()},
+    ),
+]
 
 screens = [
     Screen(
         top=bar.Bar(
-            [
-                widget.Image(
-                    filename="apps",
-                    margin=2,
-                    mouse_callbacks={"Button1": lazy.spawn("rofi -show drun")},
-                ),
-                widget.Spacer(length=8),
-                widget.GroupBox(
-                    highlight_method="block",
-                    active="#ffffff",
-                    inactive="#888888",
-                    rounded=False,
-                    this_current_screen_border="#5e81ac",
-                    padding=8,
-                    block_highlight_text_color="#000000",
-                ),
-                widget.Spacer(),
-                widget.Clock(format="%a %d %b %Y  %H:%M", padding=8),
-                widget.Spacer(length=16),
-                widget.Systray(padding=6),
-                widget.Spacer(length=8),
-                widget.Battery(format="🔋 {percent:2.0%}", padding=4),
-                widget.Volume(fmt="🔊 {}", padding=4),
-                widget.Memory(format="🧠 {MemUsed: .0f}{mm}", padding=4),
-                widget.CPU(format="⚙️ {load_percent}%", padding=4),
-                widget.Spacer(length=8),
-            ],
-            32,
-            background="#1e1e2e",
+            bar_widgets,
+            size=30,
+            background=colors["bg"],
             margin=[6, 10, 0, 10],
-            opacity=0.95,
-        ),
-    ),
+        )
+    )
 ]
 
 
