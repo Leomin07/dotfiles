@@ -222,8 +222,6 @@ bar_widgets = [
     widget.Clock(format="%a, %b %d %H:%M", foreground=colors["pink"], font=font),
     widget.Spacer(),
     # === RIGHT ===
-    widget.TextBox("󰘧", foreground=colors["blue"], font=font, padding=5),
-    widget.Hostname(foreground=colors["fg"], font=font),
     widget.CurrentLayout(foreground=colors["fg"], font=font, padding=padding),
     widget.TextBox("", foreground=colors["red"], font=font),
     widget.CPU(format="{load_percent}%", foreground=colors["red"], font=font),
