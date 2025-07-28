@@ -164,7 +164,7 @@ keys.extend([
 # Pywal Colors
 # --------------------------------------------------------
 
-colors = os.path.expanduser('~/.cache/wal/colors.json')
+colors = os.path.expanduser('~/.config/wal/colors.json')
 colordict = json.load(open(colors))
 Color0=(colordict['colors']['color0'])
 Color1=(colordict['colors']['color1'])
