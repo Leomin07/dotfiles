@@ -1,10 +1,7 @@
 #!/bin/bash
 
 # Apply wallpaper using wal
-wal -b 282738 -i ~/Wallpaper/Aesthetic2.png &&
-
-# Start picom
-picom --config ~/.config/picom/picom.conf &
+# wal -b 282738 -i ~/Wallpaper/Aesthetic2.png &&
 
 # input method
 fcitx5 -d
@@ -14,24 +11,33 @@ fcitx5 -d
 # Load notification service
 dunst &
 
-
 # Setup Wallpaper and update colors
 nitrogen --restore &
 
+# status bar
+polybar mybar &
 
-
-# Tự động khóa màn hình sau 5 phút không hoạt động
+# screensave
 xidlehook \
-  --not-when-audio \
-  --not-when-fullscreen \
-  --timer 1200 \
+    --not-when-audio \
+    --not-when-fullscreen \
+    --timer 1200 \
     'betterlockscreen -l dimblur -- --clock' \
     '' &
 
 # monitor
-xrandr --output DP-1 \
-       --mode 2560x1440 \
-       --rate 180 \
-       --pos 0x0 \
-       --scale 1x1 \
-       --depth 10
+xrandr --output DisplayPort-0 \
+    --mode 2560x1440 \
+    --rate 180 \
+    --pos 0x0 \
+    --scale 1x1 
+
+blueman-applet &
+
+# Load picom
+# picom &
+sleep 1
+if ! pgrep -x "picom" > /dev/null; then
+    picom -b --config ~/.config/picom/picom.conf
+fi
+

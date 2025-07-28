@@ -4,11 +4,13 @@
 #                          Power Options
 # ───────────────────────────────────────────────────────────────
 
-lock="  Lock"
-suspend="  Suspend"
-logout="  Logout"
-reboot="  Reboot"
-shutdown="  Shutdown"
+options=(
+    "lock:  Lock"
+    "suspend:  Suspend"
+    "logout:  Logout"
+    "reboot:  Reboot"
+    "shutdown:  Shutdown"
+)
 
 username=" $(whoami)"
 messages=("See ya!" "Adiós, amigo!" "Catch you on the flip side!" "Powering down..." "Peace out!")
@@ -29,12 +31,13 @@ rofi_cmd() {
 }
 
 run_rofi() {
-    echo -e "$lock\n$suspend\n$logout\n$reboot\n$shutdown" | rofi_cmd
+    printf "%s\n" "${options[@]}" | cut -d: -f2 | rofi_cmd
 }
 
 # ───────────────────────────────────────────────────────────────
 #                        Run Commands
 # ───────────────────────────────────────────────────────────────
+
 run_cmd() {
     case "$1" in
         shutdown)
@@ -52,26 +55,32 @@ run_cmd() {
             pkill -KILL -u "$USER"
             ;;
         lock)
-            if command -v cinnamon-screensaver-command &>/dev/null; then
-                cinnamon-screensaver-command -l
-            elif command -v betterlockscreen &>/dev/null; then
+            if command -v betterlockscreen &>/dev/null; then
                 betterlockscreen -l
             elif command -v i3lock &>/dev/null; then
                 i3lock
             else
-                echo "No lock command found!" >&2
+                notify-send "No lock tool found."
             fi
             ;;
         *)
-            echo "Usage: run_cmd {shutdown|reboot|suspend|logout|lock}"
+            notify-send "Invalid option: $1"
             ;;
     esac
 }
-
 
 # ───────────────────────────────────────────────────────────────
 #                          Main Menu
 # ───────────────────────────────────────────────────────────────
 
 chosen="$(run_rofi)"
-run_cmd "$chosen"
+
+# Get the action (key before colon) that matches the chosen label
+action=$(printf "%s\n" "${options[@]}" | grep -F ":$chosen" | cut -d: -f1)
+
+# Only run if action is not empty
+if [[ -n "$action" ]]; then
+    run_cmd "$action"
+else
+    notify-send "No action selected or invalid selection."
+fi

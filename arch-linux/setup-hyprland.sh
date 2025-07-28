@@ -38,13 +38,13 @@ PACKAGES=(
     gnome-disk-utility polkit-gnome obs-studio ntfs-3g exfat-utils imv pamac-gtk3 dconf-editor qemu libvirt virt-manager-git mpv cava keyd
 
     # --- Audio (commented out, optional) ---
-    pavucontrol-qt libdbusmenu-gtk3 playerctl pavucontrol-git
+    # pavucontrol-qt libdbusmenu-gtk3 playerctl pavucontrol-git
 
     # --- Hyprland & Wayland Environment ---
     hypridle hyprlock rofi-wayland wl-clipboard wf-recorder xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-desktop-portal xdg-desktop-portal-wlr
 
     # --- Hyprpanel, Wayland Ext, System, Misc ---
-    ags-hyprpanel-git aylurs-gtk-shell-git wireplumber libgtop bluez bluez-utils blueman networkmanager dart-sass upower gvfs gtksourceview3 libsoup3 swww btop matugen hyprsunset hyprpicker grimblast power-profiles-daemon pacman-contrib brightnessctl pywal
+    ags-hyprpanel-git aylurs-gtk-shell-git wireplumber libgtop bluez bluez-utils blueman dart-sass upower gvfs gtksourceview3 libsoup3 swww btop matugen hyprsunset hyprpicker grimblast power-profiles-daemon pacman-contrib brightnessctl pywal
 )
 
 # --------------------------------------

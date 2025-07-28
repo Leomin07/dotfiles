@@ -35,13 +35,13 @@ PACKAGES=(
     nemo nemo-fileroller yazi
 
     # --- System Utilities & Media ---
-    gnome-disk-utility polkit-gnome obs-studio ntfs-3g exfat-utils imv pamac-gtk3 dconf-editor qemu libvirt virt-manager-git mpv cava keyd bluez bluez-utils blueman networkmanager grimblast wl-clipboard wf-recorder xclip
+    gnome-disk-utility polkit-gnome obs-studio ntfs-3g exfat-utils imv pamac-gtk3 dconf-editor qemu libvirt virt-manager-git mpv cava keyd xclip
 
     # --- Audio (commented out, optional) ---
-    pavucontrol-qt libdbusmenu-gtk3 playerctl pavucontrol-git
+    pamixer playerctl bluez bluez-utils blueman
 
     # qtile
-    rofi picom pywal python-psutil python-pybluez pamixer dunst xidlehook xsecurelock nitrogen xorg-xrandr i3lock-color betterlockscreen
+    rofi picom python-psutil python-pybluez dunst xidlehook xsecurelock nitrogen xorg-xrandr i3lock-color betterlockscreen polybar scrot yad xdotool
 )
 
 # --------------------------------------
@@ -82,7 +82,7 @@ if ! is_installed "paru"; then
     log_info "Installing paru..."
     sudo pacman -S --needed base-devel
     git clone https://aur.archlinux.org/paru.git
-    cd paru && makepkg -si --noconfirm && cd ..
+    cd paru && makepkg -si --noconfirm && cd .. && rm -rf paru
 fi
 
 # --------------------------------------
@@ -442,8 +442,8 @@ stow_configs() {
 }
 
 config_qtile() {
-    sudo systemctl start bluetooth.service
     sudo systemctl enable bluetooth.service
+    sudo systemctl start bluetooth.service
     gsettings set org.gnome.desktop.privacy remember-recent-files false
     gsettings set org.cinnamon.desktop.default-applications.terminal exec ghostty
     gsettings set org.cinnamon.desktop.privacy remember-recent-files false
@@ -453,6 +453,10 @@ config_qtile() {
     gsettings set org.gnome.desktop.interface cursor-theme "Bibata-Modern-Ice"
     gsettings set org.gnome.desktop.interface font-name "JetBrainsMono Nerd Font 11"
     mkdir -p "$HOME/Documents" "$HOME/Downloads" "$HOME/Video" "$HOME/Music"
+    chmod +x ~/.config/polybar/scripts/bluetooth.sh
+    chmod +x ~/.config/qtile/autostart_once.sh
+    chmod +x ~/.config/qtile/scripts/{wallpaper.sh,screenshot.sh,reload_config.sh}
+    cp ./.xinitrc $HOME
 
 }
 
