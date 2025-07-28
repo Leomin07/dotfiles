@@ -93,6 +93,9 @@ keys = [
     Key([mod], "b", lazy.spawn("thorium-browser"), desc="thorium"),
     Key([mod], "c", lazy.spawn("code"), desc="vscode"),
     Key([mod], "d", lazy.spawn("rofi -show drun"), desc="rofi"),
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -q sset Master 5%+")),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -q sset Master 5%-")),
+    Key([], "XF86AudioMute", lazy.spawn("amixer -q sset Master toggle")),
 ]
 
 
@@ -122,37 +125,28 @@ for i in groups:
     )
 
 
-# L A Y O U T S
-
-
-lay_config = {
-    "border_width": 0,
-    "margin": 9,
-    "border_focus": "3b4252",
-    "border_normal": "3b4252",
-    "font": "FiraCode Nerd Font",
-    "grow_amount": 2,
-}
-
-layout_theme = {
-    "border_width": 3,
-    "margin": 15,
-    "border_focus": "#E75B5B",
-    "border_normal": "FFFFFF",
-    "single_border_width": 3,
-}
-
 # ---------------------------------------------------------------------------- #
 #                                    Layouts                                   #
 # ---------------------------------------------------------------------------- #
 
+layout_theme = {
+    "border_width": 3,
+    "margin": 12,
+    "border_focus": "#d4be98",
+    "border_normal": "#24273A",
+    "single_border_width": 3,
+}
+
 layouts = [
-    layout.Max(**layout_theme),
+    # Tiling Layouts
     layout.MonadTall(**layout_theme),
     layout.MonadWide(**layout_theme),
     layout.RatioTile(**layout_theme),
+    # Fullscreen Layout
+    layout.Max(**layout_theme),
     layout.Floating(),
 ]
+
 
 widget_defaults = dict(
     font="sans",
