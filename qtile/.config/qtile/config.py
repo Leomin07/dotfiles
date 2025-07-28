@@ -93,6 +93,9 @@ keys = [
     Key([mod], "b", lazy.spawn("thorium-browser"), desc="thorium"),
     Key([mod], "c", lazy.spawn("code"), desc="vscode"),
     Key([mod], "d", lazy.spawn("rofi -show drun"), desc="rofi"),
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -q sset Master 5%+")),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -q sset Master 5%-")),
+    Key([], "XF86AudioMute", lazy.spawn("amixer -q sset Master toggle")),
 ]
 
 
@@ -137,8 +140,8 @@ lay_config = {
 layout_theme = {
     "border_width": 3,
     "margin": 15,
-    "border_focus": "#E75B5B",
-    "border_normal": "FFFFFF",
+    "border_focus": "#d4be98",
+    "border_normal": "#24273A",
     "single_border_width": 3,
 }
 
