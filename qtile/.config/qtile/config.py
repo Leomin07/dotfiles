@@ -125,37 +125,28 @@ for i in groups:
     )
 
 
-# L A Y O U T S
-
-
-lay_config = {
-    "border_width": 0,
-    "margin": 9,
-    "border_focus": "3b4252",
-    "border_normal": "3b4252",
-    "font": "FiraCode Nerd Font",
-    "grow_amount": 2,
-}
+# ---------------------------------------------------------------------------- #
+#                                    Layouts                                   #
+# ---------------------------------------------------------------------------- #
 
 layout_theme = {
     "border_width": 3,
-    "margin": 15,
+    "margin": 12,
     "border_focus": "#d4be98",
     "border_normal": "#24273A",
     "single_border_width": 3,
 }
 
-# ---------------------------------------------------------------------------- #
-#                                    Layouts                                   #
-# ---------------------------------------------------------------------------- #
-
 layouts = [
-    layout.Max(**layout_theme),
+    # Tiling Layouts
     layout.MonadTall(**layout_theme),
     layout.MonadWide(**layout_theme),
     layout.RatioTile(**layout_theme),
+    # Fullscreen Layout
+    layout.Max(**layout_theme),
     layout.Floating(),
 ]
+
 
 widget_defaults = dict(
     font="sans",
@@ -236,15 +227,16 @@ bar_widgets = [
     ),
     widget.TextBox("", foreground=colors["yellow"], font=font),
     widget.Memory(format="{MemUsed:.0f} GiB", foreground=colors["yellow"], font=font),
-    # widget.TextBox("", foreground=colors["yellow"], font=font),
-    # widget.Volume(
-    #     emoji=True,
-    #     emoji_list=["🔇", "🔈", "🔉", "🔊"],
-    #     fontsize=16,
-    #     foreground=colors["yellow"],
-    #     background=colors["dark"],
-    #     # update_interval=0.2,
-    # ),
+    widget.TextBox("", foreground=colors["yellow"], font=font),
+    widget.Volume(
+        mute_command="pamixer --toggle-mute",
+        volume_up_command="pamixer -i 5",
+        volume_down_command="pamixer -d 5",
+        get_volume_command="pamixer --get-volume-human",
+        update_interval=0.2,
+        unmute_format="{volume}%",
+        mute_format="M",
+    ),
     # widget.TextBox("󰈀", foreground=colors["pink"], font=font),
     # widget.Net(interface="enp3s0", format="Wired", foreground=colors["pink"], font=font),
     widget.TextBox("", foreground=colors["blue"], font=font),
