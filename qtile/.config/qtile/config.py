@@ -221,10 +221,9 @@ bar_widgets = [
     widget.Clock(format="%a, %b %d %H:%M", foreground=colors["pink"], font=font),
     widget.Spacer(),
     # === RIGHT ===
-    widget.CurrentLayout(foreground=colors["fg"], font=font, padding=padding),
     widget.TextBox("", foreground=colors["red"], font=font),
     widget.CPU(format="{load_percent}%", foreground=colors["red"], font=font),
-    widget.TextBox("󰈁", foreground=colors["orange"], font=font),
+    widget.TextBox("", foreground=colors["orange"], font=font),
     widget.ThermalSensor(
         tag_sensor="Package id 0",
         format="{temp}°C",
@@ -232,12 +231,21 @@ bar_widgets = [
         font=font,
         padding=padding,
     ),
-    widget.TextBox("", foreground=colors["yellow"], font=font),
+    widget.TextBox("", foreground=colors["yellow"], font=font),
     widget.Memory(format="{MemUsed:.0f} GiB", foreground=colors["yellow"], font=font),
-    widget.TextBox("󰈀", foreground=colors["pink"], font=font),
-    widget.Net(
-        interface="enp3s0", format="Wired", foreground=colors["pink"], font=font
+    widget.Volume(
+        emoji=True,
+        emoji_list=["", "", ""],
+        fontsize=16,
+        foreground=colors["yellow"],
+        background=colors["dark"],
+        fmt="{}",
+        update_interval=0.2,
     ),
+    # widget.TextBox("󰈀", foreground=colors["pink"], font=font),
+    # widget.Net(
+    #     interface="enp3s0", format="Wired", foreground=colors["pink"], font=font
+    # ),
     widget.TextBox("", foreground=colors["blue"], font=font),
     widget.Bluetooth(fmt="{}", foreground=colors["blue"], font=font),
     widget.TextBox("", foreground=colors["fg"], font=font),
