@@ -252,15 +252,6 @@ decor_right = {
 widget_list = [
     widget.TextBox(
         **decor_left,
-        background=Color1+".4",
-        text='Apps',
-        foreground='ffffff',
-        desc='',
-        padding=10,
-        mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("rofi -show drun")},
-    ),
-    widget.TextBox(
-        **decor_left,
         background="#ffffff.4",
         text="  ",
         foreground="000000.6",
@@ -297,13 +288,6 @@ widget_list = [
         mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("bash " + home + "/.config/ml4w/settings/filemanager.sh")}
     ),
 
-    widget.WindowName(
-        **decor_left,
-        max_chars=50,
-        background=Color2+".4",
-        width=400,
-        padding=10
-    ),
     widget.Spacer(),
     widget.Spacer(
         length=30
@@ -314,46 +298,39 @@ widget_list = [
     ),
     widget.Memory(
         **decor_right,
-        background=Color10+".4",
         padding=10,
         measure_mem='G',
         format="{MemUsed:.0f}{mm} ({MemTotal:.0f}{mm})"
     ),
     widget.Volume(
         **decor_right,
-        background=Color12+".4",
         padding=10,
         fmt='Vol: {}',
     ),
     widget.DF(
         **decor_right,
         padding=10,
-        background=Color8+".4",
         visible_on_warn=False,
         format="{p} {uf}{m} ({r:.0f}%)"
     ),
-    #widget.Bluetooth(
-    #    **decor_right,
-    #    background=Color2+".4",
-    #    padding=10,
-    #    mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("blueman-manager")},
-    #),
+    widget.Bluetooth(
+       **decor_right,
+       padding=10,
+       mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("blueman-manager")},
+    ),
     widget.Wlan(
         **decor_right,
-        background=Color2+".4",
         padding=10,
         format='{essid} {percent:2.0%}',
         mouse_callbacks={"Button1": lambda: qtile.cmd_spawn("alacritty -e nmtui")},
     ),
     widget.Clock(
         **decor_right,
-        background=Color4+".4",
         padding=10,
         format="%Y-%m-%d / %I:%M %p",
     ),
     widget.TextBox(
         **decor_right,
-        background=Color2+".4",
         padding=5,
         text=" ",
         fontsize=20,
