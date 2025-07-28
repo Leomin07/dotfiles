@@ -13,9 +13,7 @@
 from libqtile import bar, layout, widget, hook, qtile
 from libqtile.config import Click, Drag, Group, Key, Match, hook, Screen, KeyChord
 from libqtile.lazy import lazy
-from libqtile.utils import guess_terminal
-from libqtile.dgroups import simple_key_binder
-from time import sleep
+
 
 mod = "mod4"
 terminal = "ghostty"
@@ -193,24 +191,36 @@ screens = [
     Screen(
         top=bar.Bar(
             [
-                widget.Memory(
-                    padding=10,
-                    measure_mem="G",
-                    format="{MemUsed:.0f}{mm} ({MemTotal:.0f}{mm})",
+                widget.Image(
+                    filename="apps",
+                    margin=2,
+                    mouse_callbacks={"Button1": lazy.spawn("rofi -show drun")},
                 ),
-                widget.Volume(
-                    padding=10,
-                    fmt="Vol: {}",
+                widget.Spacer(length=8),
+                widget.GroupBox(
+                    highlight_method="block",
+                    active="#ffffff",
+                    inactive="#888888",
+                    rounded=False,
+                    this_current_screen_border="#5e81ac",
+                    padding=8,
+                    block_highlight_text_color="#000000",
                 ),
-                widget.Clock(
-                    padding=10,
-                    format="%Y-%m-%d / %I:%M %p",
-                ),
+                widget.Spacer(),
+                widget.Clock(format="%a %d %b %Y  %H:%M", padding=8),
+                widget.Spacer(length=16),
+                widget.Systray(padding=6),
+                widget.Spacer(length=8),
+                widget.Battery(format="🔋 {percent:2.0%}", padding=4),
+                widget.Volume(fmt="🔊 {}", padding=4),
+                widget.Memory(format="🧠 {MemUsed: .0f}{mm}", padding=4),
+                widget.CPU(format="⚙️ {load_percent}%", padding=4),
+                widget.Spacer(length=8),
             ],
-            30,
-            border_color="#282738",
-            border_width=[0, 0, 0, 0],
-            margin=[15, 60, 6, 60],
+            32,
+            background="#1e1e2e",
+            margin=[6, 10, 0, 10],
+            opacity=0.95,
         ),
     ),
 ]
