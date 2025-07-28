@@ -337,7 +337,7 @@ config_virt_manager() {
 
 # Gnu stow config
 stow_configs() {
-    local folders=("ghostty" "kitty" "nvim" "keyd" "hyprland")
+    local folders=("ghostty" "kitty" "nvim" "keyd" "qtile")
     local config_dir="$HOME/.config"
     local dotfiles_dir="$HOME/dotfiles"
 
