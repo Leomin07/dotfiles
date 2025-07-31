@@ -394,7 +394,7 @@
         "windowtitle"
       ],
       "middle": [
-        "media"
+        "clock"
       ],
       "right": [
         "cpu",
@@ -403,7 +403,6 @@
         "volume",
         "network",
         "bluetooth",
-        "clock",
         "notifications",
         "power"
       ]

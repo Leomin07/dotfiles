@@ -10,13 +10,14 @@
         "clock"
     ],
     "modules-right": [
-        "tray",
+        // "tray",
         "cpu",
         "temperature",
         "memory",
         "bluetooth",
         "network",
         "pulseaudio",
+        "custom/wallpaper",
         "custom/wlogout"
     ],
     "hyprland/workspaces": {
@@ -60,8 +61,10 @@
     },
     "cpu": {
         "interval": 5,
-        "format": " {usage}%",
-        "format-alt": " {usage}%",
+        "format": "CPU {usage}%",
+        "format-alt": "CPU {usage}%",
+        // "format": "{usage}%",
+        // "format-alt": " {usage}%",
     },
     "temperature": {
         "thermal-zone": 2,
@@ -69,12 +72,14 @@
         "critical-threshold": 80,
         "format-critical": " {temperatureC}°C",
         "format": " {temperatureC}°C ",
-        "interval": 5
+        "interval": 3
     },
     "memory": {
         "interval": 5,
-        "format": " {used:0.1f}G",
-        "format-alt": " {used:0.1f}G"
+        "format": "RAM {used:0.1f}G",
+        "format-alt": "RAM {used:0.1f}G"
+        // "format": " {used:0.1f}G",
+        // "format-alt": " {used:0.1f}G"
     },
     "network": {
         "format-wifi": " {essid} ({signal}%)",
@@ -96,5 +101,10 @@
         "format": "",
         "on-click": "wlogout",
         "class": "wlogout-button"
+    },
+    "custom/wallpaper": {
+        "format": "",
+        "on-click": "bash -c ~/.config/hypr/scripts/wallpaper-select.sh",
+        "class": "wallpaper-button"
     }
 }

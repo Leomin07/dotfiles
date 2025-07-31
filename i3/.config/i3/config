@@ -1,0 +1,210 @@
+##########
+#   i3   #
+##########
+
+# Mod key
+set $mod Mod4
+
+# Font
+font pango:JetBrainsMono Nerd Font 13
+
+
+# Media
+bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5%
+bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -5%
+bindsym XF86AudioMute exec pamixer --toggle-mute
+
+# Use Mouse+$mod to drag floating windows
+floating_modifier $mod
+
+
+# Start a terminal
+bindsym $mod+Return exec ghostty
+
+# Kill focused window
+bindsym $mod+q kill
+
+# Start rofi
+bindsym $mod+d exec exec rofi -show drun
+
+# Alternatively, you can use the arrow keys:
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Alternatively, you can use the arrow keys:
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# Split in horizontal orientation
+bindsym $mod+h split h
+
+# Split in vertical orientation
+bindsym $mod+v split v
+
+# Enter fullscreen mode
+bindsym $mod+f fullscreen toggle
+
+# Toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+
+# Change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+# Focus parent container
+bindsym $mod+a focus parent
+
+# Workspace names
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+# Switch to workspace
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+
+# Move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
+
+# Reload configuration file
+bindsym $mod+Shift+c reload
+# Restart i3 inplace
+bindsym $mod+Shift+r restart
+# Exit i3
+# bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Exit i3?' -B 'Yes, exit i3' 'i3-msg exit'"
+
+bindsym $mod+e exec nemo
+bindsym $mod+c exec code
+bindsym $mod+b exec thorium-browser
+
+
+# Resize mode
+mode "resize" {
+        # bindsym j resize shrink width 10 px or 10 ppt
+        # bindsym k resize grow height 10 px or 10 ppt
+        # bindsym l resize shrink height 10 px or 10 ppt
+        # bindsym semicolon resize grow width 10 px or 10 ppt
+
+        bindsym Left resize shrink width 10 px or 10 ppt
+        bindsym Down resize grow height 10 px or 10 ppt
+        bindsym Up resize shrink height 10 px or 10 ppt
+        bindsym Right resize grow width 10 px or 10 ppt
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+r mode "default"
+}
+bindsym $mod+r mode "resize"
+
+#lockscreen
+bindsym $mod+l exec --no-startup-id "betterlockscreen -l"
+
+
+
+# i3-gaps settings
+for_window [class="^.*"] border pixel 0
+gaps inner 10
+gaps outer 2
+
+# Gaps control
+set $mode_gaps Gaps: (o) outer, (i) inner
+set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_inner Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)
+bindsym $mod+Shift+g mode "$mode_gaps"
+
+mode "$mode_gaps" {
+	bindsym o      mode "$mode_gaps_outer"
+	bindsym i      mode "$mode_gaps_inner"
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
+}
+
+mode "$mode_gaps_inner" {
+	bindsym plus  gaps inner current plus 5
+	bindsym minus gaps inner current minus 5
+	bindsym 0     gaps inner current set 0
+	bindsym Shift+plus  gaps inner all plus 5
+	bindsym Shift+minus gaps inner all minus 5
+	bindsym Shift+0     gaps inner all set 0
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
+}
+
+mode "$mode_gaps_outer" {
+        bindsym plus  gaps outer current plus 5
+        bindsym minus gaps outer current minus 5
+        bindsym 0     gaps outer current set 0
+
+        bindsym Shift+plus  gaps outer all plus 5
+        bindsym Shift+minus gaps outer all minus 5
+        bindsym Shift+0     gaps outer all set 0
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+
+# alt-tab window switcher
+# set $i3t_alt_tab        /home/ilyass/.config/i3/i3-alt-tab.py n #all
+# set $i3t_alt_shift_tab  /home/ilyass/.config/i3/i3-alt-tab.py p #all
+# bindsym Mod1+Tab exec   exec $i3t_alt_tab
+# bindsym Mod1+Shift+Tab  exec $i3t_alt_shift_tab
+
+# Display wallpaper
+exec_always feh --bg-fill ~/Pictures/2407.jpg
+
+# Color scheme
+# exec_always wal -R
+
+bindsym $mod+shift+s ~/.config/i3/scripts/screenshot.sh
+
+
+# ---------------------------------------------------------------------------- #
+#                                  auto_start                                  #
+# ---------------------------------------------------------------------------- #
+# Window compositor
+exec_always --no-startup-id bash -c "sleep 1 && if ! pgrep -x 'picom' > /dev/null; then picom -b --config ~/.config/picom/picom.conf; fi"
+
+# xrandr 
+exec_always --no-startup-id xrandr --output DisplayPort-0 --mode 2560x1440 --rate 180 --pos 0x0 --scale 1x1
+
+# polybar
+exec_always --no-startup-id polybar mybar
+
+# fcitx5
+exec_always --no-startup-id fcitx5
+
+# Polkit authentication agent
+exec_always --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+
+# nitrogen 
+exec_always --no-startup-id nitrogen --restore
+
+# 
+exec_always --no-startup-id xidlehook --not-when-audio --not-when-fullscreen --timer 1200 'betterlockscreen -l dimblur -- --clock' ''

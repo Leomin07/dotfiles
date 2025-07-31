@@ -33,7 +33,7 @@ window#waybar {
     background-color: #45475a; 
 }
 
-#clock, #battery, #cpu, #memory, #network, #pulseaudio, #tray, #bluetooth, #custom-wlogout , #temperature, #workspaces, #window {
+#clock, #battery, #cpu, #memory, #network, #pulseaudio, #tray, #bluetooth, #custom-wlogout , #temperature, #workspaces, #window, #custom-wallpaper {
     padding: 0 10px;
     margin: 0 5px;
     background-color: #282828; 

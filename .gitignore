@@ -76,3 +76,6 @@ var/
 *.sqlite3
 *.db
 plugged/
+
+
+**/tempCodeRunnerFile.sh

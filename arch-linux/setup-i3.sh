@@ -26,31 +26,22 @@ PACKAGES=(
     fcitx5 fcitx5-im fcitx5-qt fcitx5-gtk fcitx5-bamboo fcitx5-configtool
 
     # --- Fonts ---
-    ttf-jetbrains-mono-nerd noto-fonts noto-fonts-emoji ttf-dejavu ttf-roboto ttf-liberation adobe-source-han-sans-otc-fonts
+    ttf-jetbrains-mono-nerd noto-fonts noto-fonts noto-fonts-emoji ttf-dejavu ttf-roboto ttf-liberation adobe-source-han-sans-otc-fonts
 
     # --- Cursors, Themes, Look & Feel ---
-    bibata-cursor-theme adw-gtk-theme nwg-displays nwg-look
+    bibata-cursor-theme adw-gtk-theme
 
     # --- File Managers & Utilities ---
-    nemo nemo-fileroller yazi
+    nemo nemo-fileroller
 
     # --- System Utilities & Media ---
-    gnome-disk-utility polkit-gnome obs-studio ntfs-3g exfat-utils imv pamac-gtk3 dconf-editor qemu libvirt virt-manager-git mpv cava keyd
+    gnome-disk-utility polkit-gnome obs-studio ntfs-3g exfat-utils imv pamac-gtk3 dconf-editor qemu libvirt virt-manager-git mpv cava keyd xclip
 
-    # --- Audio (commented out, optional) ---
-    # pavucontrol-qt libdbusmenu-gtk3 playerctl pavucontrol-git
+    # --- Audio & Bluetooth (commented out, optional) ---
+    pamixer playerctl bluez bluez-utils blueman
 
-    # --- Hyprland & Wayland Environment ---
-    hypridle hyprlock rofi-wayland wl-clipboard wf-recorder xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-desktop-portal xdg-desktop-portal-wlr swww
-
-    # Status bar
-    waybar wlogout grimblast
-
-    # bluetooth
-    # bluez bluez-utils blueman
-
-    # --- Hyprpanel, Wayland Ext, System, Misc ---
-    # ags-hyprpanel-git aylurs-gtk-shell-git wireplumber libgtop bluez bluez-utils blueman dart-sass upower gvfs gtksourceview3 libsoup3 swww btop matugen hyprsunset hyprpicker grimblast power-profiles-daemon pacman-contrib brightnessctl pywal
+    # i3
+    rofi picom python-psutil python-pybluez dunst xidlehook xsecurelock nitrogen xorg-xrandr polybar scrot yad xdotool i3lock i3-gaps
 )
 
 # --------------------------------------
@@ -91,7 +82,7 @@ if ! is_installed "paru"; then
     log_info "Installing paru..."
     sudo pacman -S --needed base-devel
     git clone https://aur.archlinux.org/paru.git
-    cd paru && makepkg -si --noconfirm && cd ..
+    cd paru && makepkg -si --noconfirm && cd .. && rm -rf paru
 fi
 
 # --------------------------------------
@@ -346,7 +337,7 @@ config_virt_manager() {
 
 # Gnu stow config
 stow_configs() {
-    local folders=("ghostty" "kitty" "nvim" "keyd" "hyprland")
+    local folders=("ghostty" "kitty" "nvim" "keyd" "i3")
     local config_dir="$HOME/.config"
     local dotfiles_dir="$HOME/dotfiles"
 
@@ -367,8 +358,6 @@ stow_configs() {
         local normalized_dotfiles_root
         normalized_dotfiles_root="$(readlink -f "$dotfiles_dir")"
         normalized_dotfiles_root="${normalized_dotfiles_root%/}" # Remove trailing slash if any
-
-        mv ~/.config/hypr ~/.config/hypr.bak
 
         for folder in "${folders[@]}"; do
             log_info "Processing package '$folder'..."
@@ -452,9 +441,9 @@ stow_configs() {
     )
 }
 
-config_hyprland() {
-    sudo systemctl start bluetooth.service
+config_i3() {
     sudo systemctl enable bluetooth.service
+    sudo systemctl start bluetooth.service
     gsettings set org.gnome.desktop.privacy remember-recent-files false
     gsettings set org.cinnamon.desktop.default-applications.terminal exec ghostty
     gsettings set org.cinnamon.desktop.privacy remember-recent-files false
@@ -464,10 +453,14 @@ config_hyprland() {
     gsettings set org.gnome.desktop.interface cursor-theme "Bibata-Modern-Ice"
     gsettings set org.gnome.desktop.interface font-name "JetBrainsMono Nerd Font 11"
     mkdir -p "$HOME/Documents" "$HOME/Downloads" "$HOME/Video" "$HOME/Music"
+    chmod +x ~/.config/polybar/scripts/bluetooth.sh
+    chmod +x ~/.config/i3/autostart_once.sh
+    chmod +x ~/.config/i3/scripts/{wallpaper.sh,screenshot.sh,reload_config.sh}
+    cp ./.xinitrc $HOME
 
 }
 
-# Set ap default hyprland
+# Set ap default i3
 set_my_default_apps() {
     echo "Setting default applications..."
 
@@ -615,12 +608,12 @@ configure_git_and_ssh
 config_docker
 
 # Stow config
-stow_configs
+# stow_configs
 
 # Optional setups with yes/no prompt for user customization
-if ask_yes_no "Config hyprland?"; then config_hyprland; fi
+if ask_yes_no "Config i3?"; then config_i3; fi
 if ask_yes_no "Remap keyd?"; then setup_keyd_remap; fi
-if ask_yes_no "Configure app default hyprland?"; then set_my_default_apps; fi
+if ask_yes_no "Configure app default i3?"; then set_my_default_apps; fi
 if ask_yes_no "Clone wallpaper repository?"; then clone_wallpaper; fi
 if ask_yes_no "Install warp client?"; then install_warp_client; fi
 if ask_yes_no "Install virt_manager?"; then config_virt_manager; fi
