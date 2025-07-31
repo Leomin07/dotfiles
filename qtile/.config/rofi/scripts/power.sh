@@ -40,32 +40,26 @@ run_rofi() {
 
 run_cmd() {
     case "$1" in
-        shutdown)
-            systemctl poweroff
-            ;;
-        reboot)
-            systemctl reboot
-            ;;
-        suspend)
-            mpc -q pause 2>/dev/null
-            amixer set Master mute
-            systemctl suspend
-            ;;
-        logout)
-            pkill -KILL -u "$USER"
-            ;;
-        lock)
-            if command -v betterlockscreen &>/dev/null; then
-                betterlockscreen -l
-            elif command -v i3lock &>/dev/null; then
-                i3lock
-            else
-                notify-send "No lock tool found."
-            fi
-            ;;
-        *)
-            notify-send "Invalid option: $1"
-            ;;
+    shutdown)
+        systemctl poweroff
+        ;;
+    reboot)
+        systemctl reboot
+        ;;
+    suspend)
+        mpc -q pause 2>/dev/null
+        amixer set Master mute
+        systemctl suspend
+        ;;
+    logout)
+        pkill -KILL -u "$USER"
+        ;;
+    lock)
+        bash -c ~/.config/qtile/scripts/lockscreen.sh
+        ;;
+    *)
+        notify-send "Invalid option: $1"
+        ;;
     esac
 }
 

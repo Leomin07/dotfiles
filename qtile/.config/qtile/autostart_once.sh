@@ -22,7 +22,7 @@ xidlehook \
     --not-when-audio \
     --not-when-fullscreen \
     --timer 1200 \
-    'betterlockscreen -l dimblur -- --clock' \
+    'bash -c "~/.config/qtile/scripts/lockscreen.sh"' \
     '' &
 
 # monitor

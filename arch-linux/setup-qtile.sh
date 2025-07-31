@@ -29,19 +29,19 @@ PACKAGES=(
     ttf-jetbrains-mono-nerd noto-fonts noto-fonts noto-fonts-emoji ttf-dejavu ttf-roboto ttf-liberation adobe-source-han-sans-otc-fonts
 
     # --- Cursors, Themes, Look & Feel ---
-    bibata-cursor-theme adw-gtk-theme
+    bibata-cursor-theme adw-gtk-theme papirus-icon-theme
 
     # --- File Managers & Utilities ---
     nemo nemo-fileroller yazi
 
     # --- System Utilities & Media ---
-    gnome-disk-utility polkit-gnome obs-studio ntfs-3g exfat-utils imv pamac-gtk3 dconf-editor qemu libvirt virt-manager-git mpv cava keyd xclip
+    gnome-disk-utility polkit-gnome obs-studio ntfs-3g exfat-utils imv pamac-gtk3 dconf-editor qemu libvirt virt-manager-git mpv cava keyd xclip unzip
 
     # --- Audio (commented out, optional) ---
     pamixer playerctl bluez bluez-utils blueman
 
     # qtile
-    rofi picom python-psutil python-pybluez dunst xidlehook xsecurelock nitrogen xorg-xrandr i3lock-color betterlockscreen polybar scrot yad xdotool
+    rofi picom python-psutil python-pybluez dunst xidlehook nitrogen xorg-xrandr i3lock-color betterlockscreen polybar scrot yad xdotool pavucontrol sddm-sugar-candy-git
 )
 
 # --------------------------------------
@@ -326,15 +326,6 @@ setup_zsh() {
     log_warning "📌 Add the following plugins to your ~/.zshrc: plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions z docker docker-compose)"
 }
 
-# --------------------------------------
-# INSTALL VIRTUALIZATION SOFTWARE (QEMU, Virt-Manager, etc.)
-# --------------------------------------
-config_virt_manager() {
-    sudo systemctl enable --now libvirtd
-    sudo usermod -aG libvirt ${USER}
-    sudo systemctl restart libvirtd
-}
-
 # Gnu stow config
 stow_configs() {
     local folders=("ghostty" "kitty" "nvim" "keyd" "qtile")
@@ -441,98 +432,83 @@ stow_configs() {
     )
 }
 
-config_qtile() {
-    sudo systemctl enable bluetooth.service
-    sudo systemctl start bluetooth.service
-    gsettings set org.gnome.desktop.privacy remember-recent-files false
-    gsettings set org.cinnamon.desktop.default-applications.terminal exec ghostty
-    gsettings set org.cinnamon.desktop.privacy remember-recent-files false
-    gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
-    gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3-dark"
-    gsettings set org.gnome.desktop.interface icon-theme "Adwaita"
-    gsettings set org.gnome.desktop.interface cursor-theme "Bibata-Modern-Ice"
-    gsettings set org.gnome.desktop.interface font-name "JetBrainsMono Nerd Font 11"
+setup_qtile_environment() {
+    echo "🔧 Setting up Qtile environment..."
+
+    # Enable + start Bluetooth
+    sudo systemctl enable --now bluetooth.service
+
+    # Enable + start libvirtd (virtualization)
+    sudo systemctl enable --now libvirtd
+    sudo usermod -aG libvirt "$USER"
+    sudo systemctl restart libvirtd
+
+    # Gnome interface settings
+    local base="org.gnome.desktop.interface"
+    declare -A gnome_settings=(
+        [color-scheme]="prefer-dark"
+        [gtk-theme]="adw-gtk3-dark"
+        [icon-theme]="Adwaita"
+        [cursor-theme]="Bibata-Modern-Ice"
+        [font-name]="JetBrainsMono Nerd Font 11"
+    )
+
+    for key in "${!gnome_settings[@]}"; do
+        gsettings set "$base" "$key" "${gnome_settings[$key]}" || true
+    done
+
+
+    # Cinnamon settings
+    gsettings set org.cinnamon.desktop.default-applications.terminal exec ghostty || true
+    gsettings set org.cinnamon.desktop.privacy remember-recent-files false || true
+
+    # Tạo thư mục mặc định nếu chưa có
     mkdir -p "$HOME/Documents" "$HOME/Downloads" "$HOME/Video" "$HOME/Music"
+
+    # Cấp quyền cho các script Qtile và Polybar
     chmod +x ~/.config/polybar/scripts/bluetooth.sh
     chmod +x ~/.config/qtile/autostart_once.sh
-    chmod +x ~/.config/qtile/scripts/{wallpaper.sh,screenshot.sh,reload_config.sh}
-    cp ./.xinitrc $HOME
+    chmod +x ~/.config/qtile/scripts/{wallpaper.sh,screenshot.sh,reload_config.sh,lockscreen.sh}
 
-}
+    # Copy file .xinitrc
+    cp ./.xinitrc "$HOME"
 
-# Set ap default qtile
-set_my_default_apps() {
-    echo "Setting default applications..."
+    echo "📦 Setting default applications..."
 
-    # --- 1. Set Thorium Browser as the default web browser ---
-    THORIUM_DESKTOP="thorium-browser.desktop" # Or the exact name you find
+    declare -A default_apps=(
+        [web - browser]="thorium-browser.desktop"
+        [video / mp4]="mpv.desktop"
+        [video / x - matroska]="mpv.desktop"
+        [video / webm]="mpv.desktop"
+        [video / avi]="mpv.desktop"
+        [audio / mpeg]="mpv.desktop"
+        [audio / flac]="mpv.desktop"
+        [audio / wav]="mpv.desktop"
+        [application / x - terminal - emulator]="com.mitchellh.ghostty.desktop"
+        [application / pdf]="org.pwmt.zathura.desktop"
+        [image / png]="imv.desktop"
+        [image / jpeg]="imv.desktop"
+        [image / gif]="imv.desktop"
+        [image / webp]="imv.desktop"
+        [image / bmp]="imv.desktop"
+        [image / tiff]="imv.desktop"
+        [image / svg + xml]="imv.desktop"
+    )
 
-    echo "  - Setting Thorium Browser as the default web browser..."
-    xdg-settings set default-web-browser "$THORIUM_DESKTOP"
-    if [ $? -eq 0 ]; then
-        echo "    -> Thorium Browser has been set as default."
-    else
-        echo "    -> Error: Could not set Thorium Browser as default. Ensure '$THORIUM_DESKTOP' exists."
-    fi
+    for mime in "${!default_apps[@]}"; do
+        xdg-mime default "${default_apps[$mime]}" "$mime" 2>/dev/null ||
+            echo "⚠️ Could not set ${default_apps[$mime]} for $mime"
+    done
 
-    # --- 2. Set mpv as the default media player ---
-    MPV_DESKTOP="mpv.desktop" # Usually mpv.desktop
+    # Set default browser
+    xdg-settings set default-web-browser "thorium-browser.desktop" ||
+        echo "⚠️ Failed to set Thorium as default browser."
 
-    echo "  - Setting mpv as the default media player..."
-    xdg-mime default "$MPV_DESKTOP" video/mp4
-    xdg-mime default "$MPV_DESKTOP" video/x-matroska # .mkv
-    xdg-mime default "$MPV_DESKTOP" video/webm
-    xdg-mime default "$MPV_DESKTOP" video/avi
-    xdg-mime default "$MPV_DESKTOP" audio/mpeg # .mp3
-    xdg-mime default "$MPV_DESKTOP" audio/flac
-    xdg-mime default "$MPV_DESKTOP" audio/wav
-    # Add other media formats if needed
-    if [ $? -eq 0 ]; then
-        echo "    -> mpv has been set as default for media formats."
-    else
-        echo "    -> Error: Could not set mpv as default. Ensure '$MPV_DESKTOP' exists."
-    fi
 
-    # --- 3. Set ghostty as the default terminal emulator ---
-    GHOSTTY_DESKTOP="com.mitchellh.ghostty.desktop" # Based on your previous input
+    sudo mkdir -p /etc                                  
+    echo -e "[Theme]\nCurrent=sugar-candy" | sudo tee /etc/sddm.conf
 
-    echo "  - Setting ghostty as the default terminal emulator..."
-    xdg-mime default "$GHOSTTY_DESKTOP" application/x-terminal-emulator
-    if [ $? -eq 0 ]; then
-        echo "    -> ghostty has been set as default for terminal."
-    else
-        echo "    -> Error: Could not set ghostty as default. Ensure '$GHOSTTY_DESKTOP' exists."
-    fi
-
-    # --- 4. Set zathura as the default PDF viewer ---
-    ZATHURA_DESKTOP="org.pwmt.zathura.desktop" # Based on your previous input; commonly zathura.desktop
-
-    echo "  - Setting zathura as the default PDF viewer..."
-    xdg-mime default "$ZATHURA_DESKTOP" application/pdf
-    if [ $? -eq 0 ]; then
-        echo "    -> zathura has been set as default for PDFs."
-    else
-        echo "    -> Error: Could not set zathura as default. Ensure '$ZATHURA_DESKTOP' exists."
-    fi
-
-    # --- 5. Set Imv as the default image viewer ---
-    IMV_DESKTOP="imv.desktop" # Common .desktop name for Imv
-
-    echo "  - Setting Imv as the default image viewer..."
-    xdg-mime default "$IMV_DESKTOP" image/png
-    xdg-mime default "$IMV_DESKTOP" image/jpeg
-    xdg-mime default "$IMV_DESKTOP" image/gif
-    xdg-mime default "$IMV_DESKTOP" image/webp
-    xdg-mime default "$IMV_DESKTOP" image/bmp
-    xdg-mime default "$IMV_DESKTOP" image/tiff
-    xdg-mime default "$IMV_DESKTOP" image/svg+xml # For SVG images (if Imv supports)
-    if [ $? -eq 0 ]; then
-        echo "    -> Imv has been set as default for image formats."
-    else
-        echo "    -> Error: Could not set Imv as default. Ensure '$IMV_DESKTOP' exists."
-    fi
-
-    echo "Default application setup complete."
+    echo "✅ Qtile environment setup complete."
 }
 
 setup_keyd_remap() {
@@ -611,11 +587,9 @@ config_docker
 stow_configs
 
 # Optional setups with yes/no prompt for user customization
-if ask_yes_no "Config qtile?"; then config_qtile; fi
+if ask_yes_no "Setup qtile environment?"; then setup_qtile_environment; fi
 if ask_yes_no "Remap keyd?"; then setup_keyd_remap; fi
-if ask_yes_no "Configure app default qtile?"; then set_my_default_apps; fi
 if ask_yes_no "Clone wallpaper repository?"; then clone_wallpaper; fi
 if ask_yes_no "Install warp client?"; then install_warp_client; fi
-if ask_yes_no "Install virt_manager?"; then config_virt_manager; fi
 
 log_success "Arch Linux setup script completed!"
